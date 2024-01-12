@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:customCompents="clr-namespace:WorkoutApp.CustomComponents"
+             x:Class="WorkoutApp.Pages.ExercisePage"
+             Title="Exercise Page">
+    <ContentPage.Resources>
+        <Style TargetType="Label">
+            <Setter Property="HorizontalOptions" Value="Center"/>
+            <Setter Property="VerticalOptions" Value="Center"/>
+        </Style>
+    </ContentPage.Resources>
+    <VerticalStackLayout>
+        <Border Background="{StaticResource TitleColor}">
+            <Label
+                x:Name="exerciseTitle"
+                Text="{Binding ExerciseTitle}"
+                FontSize="{StaticResource TitleFontSize}"
+                TextColor="{StaticResource TitleTextColor}"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center" />
+        </Border>
+        <!--Put grid here to get input for what set the user wants to edit
+        then allow user to edit weight and reps for the set.
+        Also allow user to add set-->
+        <Border BackgroundColor="{StaticResource ComponentBgColor}">
+            <Grid x:Name="setGrid"
+                  RowDefinitions="Auto, Auto"
+                  ColumnDefinitions="1*, 2*"
+                  Padding="5">
+                <!--row one-->
+                <Label x:Name="set1Label" Text="Set 1" Grid.Row="0" Grid.Column="0"/>
+                <HorizontalStackLayout Grid.Column="1" Grid.Row="0" HorizontalOptions="Center">
+                    <Label x:Name="weightLabel" Text="Weight:"/>
+                    <Entry x:Name="set1Weight" Text="{Binding Set1Weight}" WidthRequest="60"
+                           Keyboard="Numeric"/>
+                    <Label x:Name="repLabel" Text="Reps" />
+                    <Entry x:Name="set1Reps" Text="{Binding Set1Reps}" WidthRequest="60"
+                           Keyboard="Numeric"/>
+                </HorizontalStackLayout>
+                <!--row two-->
+                <Label x:Name="set2Label" Text="Set 2" Grid.Row="1" Grid.Column="0"/>
+                <customCompents:SetComponent Grid.Row="1" Grid.Column="1" >
+
+                </customCompents:SetComponent>
+            </Grid>
+        </Border>
+        <Button Text="Add Set" Clicked="OnAddSetButtonClicked" WidthRequest="100"
+                Margin="10, 5, 5, 5"/>
+    </VerticalStackLayout>
+</ContentPage>

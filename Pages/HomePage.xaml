@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:customcomponents="clr-namespace:WorkoutApp.CustomComponents"
+             x:Class="WorkoutApp.Pages.HomePage"
+             Title="Home Page">
+    <ContentPage.Resources>
+        <Style TargetType="Label">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="22"/>
+        </Style>
+    </ContentPage.Resources>
+    <VerticalStackLayout>
+        <Border Background="{StaticResource TitleColor}">
+            <Label 
+                Text="Welcome to Zenith"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center"
+                FontSize="30"
+                Background="{StaticResource TitleColor}"/>
+        </Border>
+        <Border Background="{StaticResource TitleColor}">
+            <Grid BackgroundColor="Black"
+                  ColumnDefinitions="1*"
+                  RowDefinitions="Auto, Auto, Auto, Auto"
+                  Padding="5"
+                  Margin="15">
+                <!--test db addworkout function here-->
+                <VerticalStackLayout x:Name="workoutStackLayout" Grid.Row="1">
+
+                </VerticalStackLayout>
+                <Border Stroke="DarkSlateBlue"
+                        Background="DarkSlateBlue"
+                        x:Name="workoutEntry"
+                        Grid.Row="2"
+                        Padding="5"
+                        IsVisible="False">
+                    <Entry x:Name="workoutTitleEntry"
+                           Placeholder="Enter workout title"
+                           Completed="OnEntryCompleted"
+                           Unfocused="workoutTitleEntryUnfocused">
+                        <Entry.Keyboard>
+                            <Keyboard x:FactoryMethod="Create">
+                                <x:Arguments>
+                                    <KeyboardFlags>CapitalizeSentence</KeyboardFlags>
+                                </x:Arguments>
+                            </Keyboard>
+                        </Entry.Keyboard>
+                    </Entry>
+                </Border>
+                <Button Text="Add Workout"
+                        HorizontalOptions="Center" 
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        Clicked="OnAddWorkoutButtonClicked"
+                        Margin="0,15,0,0"/>
+            </Grid>
+        </Border>
+    </VerticalStackLayout>
+</ContentPage>

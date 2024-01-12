@@ -1,0 +1,23 @@
+﻿<?xml version = "1.0" encoding = "UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:WorkoutApp"
+             x:Class="WorkoutApp.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Color x:Key="TitleColor">Black</Color>
+            <Color x:Key="TitleTextColor">Gray</Color>
+            <Color x:Key="ComponentBgColor">#00358E</Color>
+            <x:Double x:Key="TitleFontSize">30</x:Double>
+            <Style TargetType="Border">
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="StrokeShape" Value="RoundRectangle 40"/>
+                <Setter Property="StrokeThickness" Value="5" />
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

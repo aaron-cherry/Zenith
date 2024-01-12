@@ -3,6 +3,7 @@ using WorkoutApp.DataAccess;
 using WorkoutApp.Models;
 using WorkoutApp.CustomComponents;
 using SQLite;
+using Microsoft.Maui.Controls;
 
 namespace WorkoutApp.Pages;
 
@@ -34,31 +35,7 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
     {
         try
         {
-            List<ExerciseWorkout> allExerciseWorkouts;
-            List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
-            List<Exercise> currentWorkoutExercises = new List<Exercise>();
-            allExerciseWorkouts = await App.ExWorkRepo.GetExerciseWorkouts();
-            List<Workout> workouts = await App.WorkoutRepository.GetWorkouts();
-
-            //Get current workoutId
-            int workoutId = workouts.Where(w => w.Name == WorkoutTitle).Select(w => w.WorkoutId).FirstOrDefault();
-            //Get list of exercises associated with the Id of current workout
-            List <ExerciseWorkout> filteredWorkoutExercises = allExerciseWorkouts.Where(e => e.WorkoutId == workoutId).ToList();
-
-            //Display all exercises associated with the current workout as ExerciseComponents
-            foreach (ExerciseWorkout exercise in filteredWorkoutExercises)
-            {
-                int exerciseId = exercise.ExerciseId;
-                Exercise currentExercise = allExercises.Where(e => e.ExerciseId == exerciseId).FirstOrDefault();
-                currentWorkoutExercises.Add(currentExercise);
-            }
-
-            foreach (Exercise exercise in currentWorkoutExercises)
-            {
-                ExerciseComponent exerciseComponent = new ExerciseComponent(exercise.Name);
-                exerciseGrid.Insert(0, exerciseComponent);
-            }
-
+            DisplayExercises();
         }
         catch (Exception e)
         {
@@ -66,6 +43,38 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
         }
         base.OnAppearing();
 
+    }
+    private async void DisplayExercises()
+    {
+        exerciseGrid.Clear();
+        List<ExerciseWorkout> allExerciseWorkouts;
+        List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
+        List<Exercise> currentWorkoutExercises = new List<Exercise>();
+        allExerciseWorkouts = await App.ExWorkRepo.GetExerciseWorkouts();
+        List<Workout> workouts = await App.WorkoutRepository.GetWorkouts();
+
+        //Get current workoutId
+        int workoutId = workouts.Where(w => w.Name == WorkoutTitle).Select(w => w.WorkoutId).FirstOrDefault();
+        //Get list of exercises associated with the Id of current workout
+        List<ExerciseWorkout> filteredWorkoutExercises = allExerciseWorkouts.Where(e => e.WorkoutId == workoutId).ToList();
+
+        //Display all exercises associated with the current workout as ExerciseComponents
+        foreach (ExerciseWorkout exercise in filteredWorkoutExercises)
+        {
+            int exerciseId = exercise.ExerciseId;
+            Exercise currentExercise = allExercises.Where(e => e.ExerciseId == exerciseId).FirstOrDefault();
+            currentWorkoutExercises.Add(currentExercise);
+        }
+
+        foreach (Exercise exercise in currentWorkoutExercises)
+        {
+            RowDefinition newExerciseRow = new RowDefinition { Height = GridLength.Auto };
+            int lastRow = exerciseGrid.RowDefinitions.Count - 1;
+            ExerciseComponent exerciseComponent = new ExerciseComponent(exercise.Name);
+            //create new row definition
+            exerciseGrid.RowDefinitions.Add(newExerciseRow);
+            exerciseGrid.Add(exerciseComponent, 0, lastRow);
+        }
     }
 
     private void Entry_Completed(object sender, EventArgs e)
@@ -111,12 +120,15 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
         //lastRow = exerciseGrid.RowDefinitions.Count - 1; //Recalculate last row
         //exerciseGrid.Remove(exerciseEntry);
         //exerciseGrid.Add(exerciseEntry, 0, lastRow);
-        ExerciseComponent exerciseComponent = new ExerciseComponent(exerciseEntry.Text);
-        exerciseGrid.Insert(0, exerciseComponent);
+
+        //Using custom component instead of label
+        //ExerciseComponent exerciseComponent = new ExerciseComponent(exerciseEntry.Text);
+        //exerciseGrid.Insert(0, exerciseComponent);
 
         //Let's add the exercise to the ExerciseWorkout table
         AddExerciseToDb(exerciseEntry.Text);
         statusMessageLabel.Text = $"{App.ExWorkRepo.StatusMessage}";
+        DisplayExercises();
 
         //Refocus back to exerciseEntry and clear text
         exerciseEntry.Text = "";

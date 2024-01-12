@@ -57,6 +57,7 @@ namespace WorkoutApp.DataAccess
                 if (exercise == null)
                 {
                     await App.ExerciseRepository.AddNewExercise(exerciseName);
+                    exercise = await App.ExerciseRepository.GetExercise(exerciseName);
                 }
                 //If it does exist, get the ExerciseId
                 int exerciseId = exercise.ExerciseId;

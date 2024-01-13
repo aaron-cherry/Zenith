@@ -47,6 +47,7 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
     private async void DisplayExercises()
     {
         exerciseGrid.Clear();
+        string path = FileAccessHelper.GetLocalFilePath("zenith.db3");
         List<ExerciseWorkout> allExerciseWorkouts;
         List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
         List<Exercise> currentWorkoutExercises = new List<Exercise>();
@@ -77,7 +78,7 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
         }
     }
 
-    private void Entry_Completed(object sender, EventArgs e)
+    private async void Entry_Completed(object sender, EventArgs e)
     {
         string exerciseName = exerciseEntry.Text;
         
@@ -126,7 +127,7 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
         //exerciseGrid.Insert(0, exerciseComponent);
 
         //Let's add the exercise to the ExerciseWorkout table
-        AddExerciseToDb(exerciseEntry.Text);
+        await AddExerciseToDb(exerciseEntry.Text);
         statusMessageLabel.Text = $"{App.ExWorkRepo.StatusMessage}";
         DisplayExercises();
 
@@ -135,7 +136,7 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
         exerciseEntry.Focus();
     }
 
-    private async void AddExerciseToDb(string exTitle)
+    private async Task AddExerciseToDb(string exTitle)
     {
         try
         {

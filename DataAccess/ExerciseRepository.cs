@@ -88,7 +88,7 @@ namespace WorkoutApp.DataAccess
             }
         }
 
-        public async Task deleteExercise(string exerciseName)
+        public async Task DeleteExercise(string exerciseName)
         {
             int result = 0;
             try
@@ -96,7 +96,11 @@ namespace WorkoutApp.DataAccess
                 await Init();
 
                 if (string.IsNullOrEmpty(exerciseName)) throw new Exception("Exercise name required");
-                result = await conn.DeleteAsync(new Exercise { Name = exerciseName });
+                Exercise exercise = await GetExercise(exerciseName);
+                //Delete any records in ExerciseWorkout table with exercise.Id
+                await App.ExWorkRepo.DeleteExerciseWorkout(null, exercise.ExerciseId);
+                //Delete exercise from Exercise table
+                result = await conn.DeleteAsync(exercise);
 
                 StatusMessage = $"{result} records deleted (Exercise: {exerciseName})";
             }

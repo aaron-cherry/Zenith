@@ -70,5 +70,27 @@ namespace WorkoutApp.DataAccess
                 StatusMessage = $"Failed to add {exerciseName}. Error: {ex.Message}";
             }
         }
+
+        public async Task DeleteExerciseWorkout(Nullable<int> workoutId, Nullable<int> exerciseId)
+        {
+            if (workoutId == null)
+            {
+                List<ExerciseWorkout> allExerciseWorkouts = await App.ExWorkRepo.GetExerciseWorkouts();
+                List<ExerciseWorkout> filteredExerciseWorkouts = allExerciseWorkouts.Where(e => e.ExerciseId == exerciseId).ToList();
+                foreach (ExerciseWorkout exerciseWorkout in filteredExerciseWorkouts)
+                {
+                    await conn.DeleteAsync(exerciseWorkout);
+                }
+            }
+            if(exerciseId == null)
+            {
+                List<ExerciseWorkout> allExerciseWorkouts = await App.ExWorkRepo.GetExerciseWorkouts();
+                List<ExerciseWorkout> filteredExerciseWorkouts = allExerciseWorkouts.Where(e => e.WorkoutId == workoutId).ToList();
+                foreach (ExerciseWorkout exerciseWorkout in filteredExerciseWorkouts)
+                {
+                    await conn.DeleteAsync(exerciseWorkout);
+                }
+            }
+        }
     }
 }

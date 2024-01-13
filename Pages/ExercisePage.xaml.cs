@@ -45,4 +45,11 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
         SetComponent setComponent = new SetComponent();
         setGrid.Add(setComponent, 1, lastRow);
     }
+
+    private async void OnDeleteExButtonClicked(object sender, EventArgs e)
+    {
+        //Edit deleteExercise method to search ExWorkout table for exerciseId and delete all rows with that exerciseId
+        await App.ExerciseRepository.DeleteExercise(exerciseTitle.Text);
+        DisplayAlert("Exercise Deleted", $"{App.ExerciseRepository.StatusMessage}", "Ok");
+    }
 }

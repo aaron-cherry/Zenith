@@ -47,5 +47,8 @@
         </Border>
         <Button Text="Add Set" Clicked="OnAddSetButtonClicked" WidthRequest="100"
                 Margin="10, 5, 5, 5"/>
+        <Button Text="Delete Exercise" Clicked="OnDeleteExButtonClicked" WidthRequest="150"
+                BackgroundColor="DarkRed"
+                Margin="10, 5, 5, 5"/>
     </VerticalStackLayout>
 </ContentPage>

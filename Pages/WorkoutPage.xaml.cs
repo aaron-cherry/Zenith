@@ -92,39 +92,6 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
             Exercise exercise = new Exercise { Name = exerciseName };
             workout.AddExercise(exercise);
         }
-        ////Create row definition then add it
-        //ResourceDictionary resources = Application.Current.Resources;
-        //RowDefinition newExerciseRow = new RowDefinition { Height = 50 };
-        //Border borderView = new Border { Background = (Color)resources["ComponentBgColor"] };
-
-        ////Display all exercises in workout
-        //int lastRow = exerciseGrid.RowDefinitions.Count - 1;
-        //exerciseGrid.RowDefinitions.Insert(lastRow, newExerciseRow);
-        //exerciseGrid.Add(borderView, 0, lastRow);
-
-        ////Display exerciseEntry.Text in new row
-        //var newExerciseLabel = new Label { Text = exerciseEntry.Text,
-        //    VerticalOptions = LayoutOptions.Center,
-        //    HorizontalOptions = LayoutOptions.Center };
-        //newExerciseLabel.SetValue(AutomationProperties.NameProperty, $"{FormatLabelName(newExerciseLabel.Text)}{exerciseGrid.Count}");
-
-        ////Add click event handler to newExerciseLabel
-        //TapGestureRecognizer tapGesture = new TapGestureRecognizer();
-        //tapGesture.Tapped += OnExerciseClicked;
-        //newExerciseLabel.GestureRecognizers.Add(tapGesture);
-        //borderView.GestureRecognizers.Add(tapGesture);
-
-        ////Add label to borderView
-        //borderView.Content = newExerciseLabel;
-
-        ////Let's move the exercise entry to the last row here
-        //lastRow = exerciseGrid.RowDefinitions.Count - 1; //Recalculate last row
-        //exerciseGrid.Remove(exerciseEntry);
-        //exerciseGrid.Add(exerciseEntry, 0, lastRow);
-
-        //Using custom component instead of label
-        //ExerciseComponent exerciseComponent = new ExerciseComponent(exerciseEntry.Text);
-        //exerciseGrid.Insert(0, exerciseComponent);
 
         //Let's add the exercise to the ExerciseWorkout table
         await AddExerciseToDb(exerciseEntry.Text);

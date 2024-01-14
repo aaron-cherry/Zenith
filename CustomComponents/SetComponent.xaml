@@ -9,13 +9,17 @@
         </Style>
     </ContentView.Resources>
     <VerticalStackLayout>
-        <HorizontalStackLayout HorizontalOptions="Center">
+        <HorizontalStackLayout HorizontalOptions="Center" Margin="10">
             <Label x:Name="weightLabel" Text="Weight:"/>
             <Entry x:Name="set1Weight" Text="{Binding Set1Weight}" WidthRequest="60"
            Keyboard="Numeric"/>
             <Label x:Name="repLabel" Text="Reps" />
             <Entry x:Name="set1Reps" Text="{Binding Set1Reps}" WidthRequest="60"
            Keyboard="Numeric"/>
+            <Button x:Name="deleteSetButton" Text="Delete Set" Clicked="DeleteSetButtonClicked"
+                    BackgroundColor="DarkRed" WidthRequest="70"
+                    Margin="10, 0, 0, 0"
+                    VerticalOptions="Center"/>
         </HorizontalStackLayout>
     </VerticalStackLayout>
 </ContentView>

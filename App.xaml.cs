@@ -8,7 +8,8 @@ namespace WorkoutApp
         public static WorkoutRepository WorkoutRepository { get; set; }
         public static ExerciseRepository ExerciseRepository { get; set; }
         public static ExerciseWorkoutRepository ExWorkRepo { get; set; }
-        public App(WorkoutRepository workoutRepo, ExerciseRepository exerciseRepo, ExerciseWorkoutRepository exWorkRepo)
+        public static SetRepository SetRepository { get; set; }
+        public App(WorkoutRepository workoutRepo, ExerciseRepository exerciseRepo, ExerciseWorkoutRepository exWorkRepo, SetRepository setRepo)
         {
             InitializeComponent();
 
@@ -18,6 +19,7 @@ namespace WorkoutApp
             ExWorkRepo = exWorkRepo;
             WorkoutRepository = workoutRepo;
             ExerciseRepository = exerciseRepo;
+            SetRepository = setRepo;
         }
     }
 }

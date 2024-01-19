@@ -44,7 +44,7 @@ namespace WorkoutApp.DataAccess
             return [];
         }
 
-        public async Task<Exercise> GetExercise(string exerciseName)
+        public async Task<Exercise?> GetExercise(string exerciseName)
         {
             int result = 0;
             try
@@ -54,12 +54,12 @@ namespace WorkoutApp.DataAccess
                 var exercise = allExercises.FirstOrDefault(x => x.Name == exerciseName);
                 if (exercise == null)
                 {
-                    return null;
                     StatusMessage = $"Exercise {exerciseName} not found";
+                    return null;
                 }
                 else
                 {
-                    return (Exercise)exercise;
+                    return exercise;
                 }
             }
             catch(Exception e)
@@ -78,7 +78,18 @@ namespace WorkoutApp.DataAccess
                 //Let's take the current workout title and add it to the ExerciseWorkout table
 
                 if (string.IsNullOrEmpty(exerciseName)) throw new Exception("Exercise name required");
-                result = await conn.InsertAsync(new Exercise { Name = exerciseName });
+                //Check Exercise table to see if the excerciseName already exists in the Exercises table
+                Exercise exercise = await GetExercise(exerciseName);
+                if(exercise == null)
+                {
+                    //If it doesn't exist, add it to the Exercise table
+                    result = await conn.InsertAsync(new Exercise { Name = exerciseName });
+                    StatusMessage = $"{result} records added (Exercise: {exerciseName})";
+                }
+                else
+                {
+                    StatusMessage = $"Exercise {exerciseName} already exists";
+                }
 
                 StatusMessage = $"{result} records added (Exercise: {exerciseName})";
             }

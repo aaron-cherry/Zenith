@@ -13,9 +13,7 @@ namespace WorkoutApp.Models
         //Properties: Reps, Weight
         [PrimaryKey, AutoIncrement]
         public int SetId { get; set; }
-        [PrimaryKey]
         public int WorkoutId { get; set; }
-        [PrimaryKey]
         public int ExerciseId { get; set; }
         public int SetNumber { get; set; }
         public int Reps { get; set; }

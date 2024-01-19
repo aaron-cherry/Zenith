@@ -24,6 +24,7 @@ namespace WorkoutApp
             builder.Services.AddSingleton<WorkoutRepository>(s => ActivatorUtilities.CreateInstance<WorkoutRepository>(s, dbPath));
             builder.Services.AddSingleton<ExerciseRepository>(s => ActivatorUtilities.CreateInstance<ExerciseRepository>(s, dbPath));
             builder.Services.AddSingleton<ExerciseWorkoutRepository>(s => ActivatorUtilities.CreateInstance<ExerciseWorkoutRepository>(s, dbPath));
+            builder.Services.AddSingleton<SetRepository>(s => ActivatorUtilities.CreateInstance<SetRepository>(s, dbPath));
 
             return builder.Build();
         }

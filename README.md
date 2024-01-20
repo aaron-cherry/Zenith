@@ -8,6 +8,7 @@ Currently, Zenith is able to save and hold whole workout objects.
 
 ### Next Minor Milestone
 - [ ] Add functionality to SetComponent
+- [ ] Correctly implement SetComponent for front end
 
 
 

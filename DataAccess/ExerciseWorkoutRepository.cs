@@ -63,7 +63,7 @@ namespace WorkoutApp.DataAccess
                 int exerciseId = exercise.ExerciseId;
                 //Then add to exerciseId and workoutId to ExerciseWorkout table
                 result = await conn.InsertAsync(new ExerciseWorkout { ExerciseId = exerciseId, WorkoutId = workoutId });
-                StatusMessage = $"{result} records added (Exercise ID: {exerciseName}, Workout ID: {workoutId})";
+                StatusMessage = $"{result} records added (Exercise ID: {exerciseId}, Workout ID: {workoutId})";
             }
             catch (Exception ex)
             {

@@ -44,14 +44,41 @@ namespace WorkoutApp.DataAccess
             return [];
         }
 
-        public async Task<Set?> GetSet(int exerciseId, int workoutId, int setNumber)
+        public async Task<Set?> GetSet(int setId)
         {
             int result = 0;
             try
             {
                 await Init();
                 List<Set> allSets = await App.SetRepository.GetAllSets();
-                var set = allSets.FirstOrDefault(x => x.ExerciseId == exerciseId && x.WorkoutId == workoutId && x.SetNumber == setNumber);
+                var set = allSets.FirstOrDefault(x => x.SetId == setId);
+                if (set == null)
+                {
+                    StatusMessage = $"Set {setId} not found";
+                    return null;
+                }
+                else
+                {
+                    return set;
+                }
+            }
+            catch (Exception e)
+            {
+                StatusMessage = $"Failed to retrieve set: {e.Message}";
+                return null;
+            }
+        }
+
+        public async Task<Set?> GetSet(string workoutTitle, string exerciseTitle, int setNumber)
+        {
+            int result = 0;
+            try
+            {
+                await Init();
+                List<Set> allSets = await App.SetRepository.GetAllSets();
+                Workout workout = await App.WorkoutRepository.GetWorkout(workoutTitle);
+                Exercise exercise = await App.ExerciseRepository.GetExercise(exerciseTitle);
+                var set = allSets.FirstOrDefault(x => x.ExerciseId == exercise.ExerciseId && x.WorkoutId == workout.WorkoutId && x.SetNumber == setNumber);
                 if (set == null)
                 {
                     StatusMessage = $"Set {setNumber} not found";
@@ -69,7 +96,7 @@ namespace WorkoutApp.DataAccess
             }
         }
 
-        public async Task AddSet(string workoutName, string exerciseName, int setNumber, int reps, double weight)
+        public async Task AddSet(string workoutName, string exerciseName, int setNumber)
         {
             int result = 0;
             try
@@ -79,19 +106,80 @@ namespace WorkoutApp.DataAccess
 
                 //Get current workout and exercise
                 Exercise exercise = await App.ExerciseRepository.GetExercise(exerciseName);
-                List<Workout> allWorkouts = await App.WorkoutRepository.GetWorkouts();
-                Workout? workout = allWorkouts.FirstOrDefault(x => x.Name == workoutName);
+                Workout workout = await App.WorkoutRepository.GetWorkout(workoutName);
                 //Check Set table to see if the exerciseId, workoutId, and setNumber already exist in the Set table
-                Set set = await App.SetRepository.GetSet(exercise.ExerciseId, workout.WorkoutId, setNumber);
+                Set? set = await App.SetRepository.GetSet(workoutName, exerciseName, setNumber);
                 //If it doesn't exist, add it to the Set table
                 if (set == null)
                 {
-                    await conn.InsertAsync(new Set { ExerciseId = exercise.ExerciseId, WorkoutId = workout.WorkoutId, SetNumber = setNumber, Reps = reps, Weight = weight });
+                    await conn.InsertAsync(new Set { ExerciseId = exercise.ExerciseId, WorkoutId = workout.WorkoutId, SetNumber = setNumber, Reps = 0, Weight = 0 });
                 }
             }
             catch(Exception e)
             {
                 StatusMessage = $"Failed to add set: {e.Message}";
+            }
+        }
+
+        public async Task UpdateSet(int setId, double? weight, double? reps)
+        {
+            int result = 0;
+            try
+            {
+                await Init();
+                //Check Set table to see if the setId already exists in the Set table
+                Set? set = await App.SetRepository.GetSet(setId);
+                //If it doesn't exist, throw an error
+                if (set == null)
+                {
+                    StatusMessage = $"Set {setId} not found";
+                    throw new Exception($"Set {setId} not found");
+                }
+                else
+                {
+                    //If it does exist, update the reps and weight
+                    if (reps != null)
+                    {
+                        set.Reps = reps.Value;
+                    }
+                    if (weight != null)
+                    {
+                        set.Weight = weight.Value;
+                    }
+                    result = await conn.UpdateAsync(set);
+                    StatusMessage = $"{result} records updated (Set ID: {setId})";
+                }
+            }
+            catch (Exception e)
+            {
+                StatusMessage = $"Failed to update set: {e.Message}";
+            }
+        }
+
+        public async Task DeleteSet(int setId)
+        {
+            int result = 0;
+            try
+            {
+                await Init();
+                //Check Set table to see if the setId already exists in the Set table
+                Set? set = await App.SetRepository.GetSet(setId);
+                //If it doesn't exist, throw an error
+                if (set == null)
+                {
+                    StatusMessage = $"Set {setId} not found";
+                    throw new Exception($"Set {setId} not found");
+                }
+                else
+                {
+                    //If it does exist, delete the set
+                    result = await conn.DeleteAsync(set);
+                    StatusMessage = $"{result} records deleted (Set ID: {setId})";
+                }
+            }
+            catch (Exception e)
+            {
+                StatusMessage = $"Failed to delete set: {e.Message}";
             }
         }
     }

@@ -5,9 +5,12 @@ using WorkoutApp.CustomComponents;
 namespace WorkoutApp.Pages;
 
 [QueryProperty(nameof(ExerciseTitle), "exerciseTitle")]
+[QueryProperty(nameof(WorkoutTitle), "workoutTitle")]
 public partial class ExercisePage : ContentPage, IQueryAttributable
 {
     public string? ExerciseTitle { get; set; }
+    public string? WorkoutTitle { get; set; }
+    private static List<Set> allSets;
     public ExercisePage()
     {
         InitializeComponent();
@@ -17,11 +20,71 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         ExerciseTitle = HttpUtility.UrlDecode(query["exerciseTitle"].ToString());
+        WorkoutTitle = HttpUtility.UrlDecode(query["workoutTitle"].ToString());
         // Use LabelText here
         exerciseTitle.Text = ExerciseTitle;
     }
 
-    public void OnAddSetButtonClicked(object sender, EventArgs e)
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        try
+        {
+            DisplaySets();
+        }
+        catch (Exception e)
+        {
+            DisplayAlert("Database Error", $"{e.Message}", "Ok");
+        }
+    }
+
+    private async void DisplaySets()
+    {
+        setGrid.Clear();
+        string path = FileAccessHelper.GetLocalFilePath("zenith.db3");
+        allSets = await App.SetRepository.GetAllSets();
+        List<Set> currentExerciseSets = new List<Set>();
+        List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
+        List<Exercise> exercises = await App.ExerciseRepository.GetAllExercises();
+
+        //Get current exerciseId
+        int exerciseId = exercises.Where(e => e.Name == ExerciseTitle).Select(e => e.ExerciseId).FirstOrDefault();
+        //Get list of sets associated with the Id of current exercise
+        List<Set> filteredExerciseSets = allSets.Where(s => s.ExerciseId == exerciseId).ToList();
+
+        //Order sets by setNumber
+        filteredExerciseSets = filteredExerciseSets.OrderBy(s => s.SetNumber).ToList();
+
+        //Add all sets associated with current exercise to setGrid
+        foreach (Set set in filteredExerciseSets)
+        {
+            //Create new row definition
+            RowDefinition newSetRow = new RowDefinition { Height = GridLength.Auto };
+            //Add new row definition to grid
+            setGrid.RowDefinitions.Add(newSetRow);
+            //Create new set label based on number of rows in grid
+            var newSetLabel = new Label
+            {
+                Text = $"Set {setGrid.RowDefinitions.Count}",
+                VerticalOptions = LayoutOptions.Center,
+                HorizontalOptions = LayoutOptions.Center,
+                Margin = 10
+            };
+
+
+
+            //Find last row in setGrid and add newSetLabel to the first column
+            int lastRow = setGrid.RowDefinitions.Count - 1;
+            //Create new set label based on number of rows in grid
+            setGrid.Add(newSetLabel, 0, lastRow);
+
+            //Add customComponents.SetComponent to column 1 in new row
+            SetComponent setComponent = new SetComponent(set.SetId, set.Weight, set.Reps, setGrid.RowDefinitions.Count);
+            setGrid.Add(setComponent, 1, lastRow);
+        }
+    }
+
+    public async void OnAddSetButtonClicked(object sender, EventArgs e)
     {
         //Create new row definition
         RowDefinition newSetRow = new RowDefinition { 
@@ -42,7 +105,9 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
         setGrid.Add(newSetLabel, 0, lastRow);
 
         //Add customComponents.SetComponent to column 1 in new row
-        SetComponent setComponent = new SetComponent();
+        await App.SetRepository.AddSet(WorkoutTitle, ExerciseTitle, setGrid.RowDefinitions.Count);
+        var set = await App.SetRepository.GetSet(WorkoutTitle, ExerciseTitle, setGrid.RowDefinitions.Count);
+        SetComponent setComponent = new SetComponent(set.SetId, 0, 0, lastRow);
         setGrid.Add(setComponent, 1, lastRow);
     }
 

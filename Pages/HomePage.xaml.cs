@@ -19,7 +19,7 @@ public partial class HomePage : ContentPage
         {
             workoutStackLayout.Children.Clear();
             List<Workout> allWorkouts = new List<Workout>();
-            allWorkouts = await App.WorkoutRepository.GetWorkouts();
+            allWorkouts = await App.WorkoutRepository.GetAllWorkouts();
 
             //Check if workouts have already been loaded
             if (workoutStackLayout.Children.Count > 0) return;

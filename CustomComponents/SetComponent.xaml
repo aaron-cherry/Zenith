@@ -10,12 +10,16 @@
     </ContentView.Resources>
     <VerticalStackLayout>
         <HorizontalStackLayout HorizontalOptions="Center" Margin="10">
+            <Label x:Name="setIdLabel" IsVisible="False" Text=""/>
             <Label x:Name="weightLabel" Text="Weight:"/>
-            <Entry x:Name="set1Weight" Text="{Binding Set1Weight}" WidthRequest="60"
-           Keyboard="Numeric"/>
-            <Label x:Name="repLabel" Text="Reps" />
-            <Entry x:Name="set1Reps" Text="{Binding Set1Reps}" WidthRequest="60"
-           Keyboard="Numeric"/>
+            <Entry x:Name="weightEntry" Text="Test" WidthRequest="40"
+                   Keyboard="Numeric"
+                   Completed="WeightEntryCompleted"
+                   Margin="0, 0, 5, 0"/>
+            <Label x:Name="repLabel" Text="Reps:" />
+            <Entry x:Name="repsEntry" Text="" WidthRequest="40"
+                   Keyboard="Numeric"
+                   Completed="RepsEntryCompleted"/>
             <Button x:Name="deleteSetButton" Text="Delete Set" Clicked="DeleteSetButtonClicked"
                     BackgroundColor="DarkRed" WidthRequest="70"
                     Margin="10, 0, 0, 0"

@@ -16,7 +16,7 @@ namespace WorkoutApp.Models
         public int WorkoutId { get; set; }
         public int ExerciseId { get; set; }
         public int SetNumber { get; set; }
-        public int Reps { get; set; }
+        public double Reps { get; set; }
         public double Weight { get; set; }
     }
 }

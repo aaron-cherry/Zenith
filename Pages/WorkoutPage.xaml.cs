@@ -39,7 +39,7 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
         }
         catch (Exception e)
         {
-            DisplayAlert("Database Error", $"{e.Message}", "Ok");
+            await DisplayAlert("Database Error", $"{e.Message}", "Ok");
         }
         base.OnAppearing();
 
@@ -52,7 +52,7 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
         List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
         List<Exercise> currentWorkoutExercises = new List<Exercise>();
         allExerciseWorkouts = await App.ExWorkRepo.GetExerciseWorkouts();
-        List<Workout> workouts = await App.WorkoutRepository.GetWorkouts();
+        List<Workout> workouts = await App.WorkoutRepository.GetAllWorkouts();
 
         //Get current workoutId
         int workoutId = workouts.Where(w => w.Name == WorkoutTitle).Select(w => w.WorkoutId).FirstOrDefault();
@@ -71,7 +71,7 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
         {
             RowDefinition newExerciseRow = new RowDefinition { Height = GridLength.Auto };
             int lastRow = exerciseGrid.RowDefinitions.Count - 1;
-            ExerciseComponent exerciseComponent = new ExerciseComponent(exercise.Name);
+            ExerciseComponent exerciseComponent = new ExerciseComponent(exercise.Name, WorkoutTitle);
             //create new row definition
             exerciseGrid.RowDefinitions.Add(newExerciseRow);
             exerciseGrid.Add(exerciseComponent, 0, lastRow);
@@ -110,7 +110,7 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
             //await App.ExerciseRepository.AddNewExercise(exTitle);
 
             //Get id's of current workout and exercise
-            List<Workout> workouts = await App.WorkoutRepository.GetWorkouts();
+            List<Workout> workouts = await App.WorkoutRepository.GetAllWorkouts();
             int workoutId = workouts.Where(w => w.Name == WorkoutTitle).Select(w => w.WorkoutId).FirstOrDefault();
             
             //Add to corresponding dbs
@@ -124,18 +124,18 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
         }
     }
 
-    private async void OnExerciseClicked (object sender, EventArgs e)
-    {
-        Border currentBorder = (Border)sender;
-        Label borderLabel = (Label)currentBorder.Content;
+    //private async void OnExerciseClicked (object sender, EventArgs e)
+    //{
+    //    Border currentBorder = (Border)sender;
+    //    Label borderLabel = (Label)currentBorder.Content;
 
 
-        //TODO: Figure out how to get exercise label text here(DONE)
-        string exerciseTitle = borderLabel.Text;
-        //exerciseTitle should be assigned the text of the label within the border view
-        Routing.RegisterRoute("exercise", typeof(ExercisePage));
-        await Shell.Current.GoToAsync($"exercise?exerciseTitle={exerciseTitle}");
-    }
+    //    //TODO: Figure out how to get exercise label text here(DONE)
+    //    string exerciseTitle = borderLabel.Text;
+    //    //exerciseTitle should be assigned the text of the label within the border view
+    //    Routing.RegisterRoute("exercise", typeof(ExercisePage));
+    //    await Shell.Current.GoToAsync($"exercise?exerciseTitle={exerciseTitle}&workoutTitle={WorkoutTitle}");
+    //}
 
     private async void deleteWorkoutClicked(object sender, EventArgs e)
     {

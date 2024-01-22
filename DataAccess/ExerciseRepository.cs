@@ -44,7 +44,7 @@ namespace WorkoutApp.DataAccess
             return [];
         }
 
-        public async Task<Exercise?> GetExercise(string exerciseName)
+        public async Task<Exercise> GetExercise(string exerciseName)
         {
             int result = 0;
             try

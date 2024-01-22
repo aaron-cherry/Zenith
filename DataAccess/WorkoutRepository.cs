@@ -23,7 +23,7 @@ public class WorkoutRepository
         await conn.CreateTableAsync<Workout>();            
     }
 
-    public async Task<List<Workout>> GetWorkouts()
+    public async Task<List<Workout>> GetAllWorkouts()
     {
         try
         {
@@ -38,6 +38,31 @@ public class WorkoutRepository
         }
         
         return [];
+    }
+
+    public async Task<Workout> GetWorkout(string workoutName)
+    {
+        int result = 0;
+        try
+        {
+            await Init();
+            List<Workout> allWorkouts = await App.WorkoutRepository.GetAllWorkouts();
+            var workout = allWorkouts.FirstOrDefault(x => x.Name == workoutName);
+            if (workout == null)
+            {
+                StatusMessage = $"Workout {workoutName} not found";
+                throw new Exception($"Workout {workoutName} not found");
+            }
+            else
+            {
+                return workout;
+            }
+        }
+        catch (Exception e)
+        {
+            StatusMessage = $"Failed to retrieve {workoutName}. Error: {e.Message}";
+        }
+        return null;
     }
     public async Task AddNewWorkout(string workoutName)
     {

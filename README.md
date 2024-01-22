@@ -1,14 +1,14 @@
-# WorkoutApp
+# Zenith Workout App
 ## I will keep an updated summary of the current state of development here
 
-Currently, Zenith is able to save and hold whole workout objects.
+**MVP Finished!**
+For now, I will be testing this in the gym myself and fix any issues I run into. After that, there are a select group of people who will be testing the app and giving me feedback.
 
 ### Next Major Milestone
-- [ ] Save set data and associate it with Exercise objects
+- [ ] Field test time. Note any issues here
 
 ### Next Minor Milestone
-- [ ] Add functionality to SetComponent
-- [ ] Correctly implement SetComponent for front end
+- [ ] Some non-crucial quality-of-life improvements need to be implented. Will be generating a list and posting it here soon.
 
 
 

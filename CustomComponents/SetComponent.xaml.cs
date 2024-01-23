@@ -23,11 +23,22 @@ public partial class SetComponent : ContentView
     public async void WeightEntryCompleted(object sender, EventArgs e)
     {
         await App.SetRepository.UpdateSet(int.Parse(setIdLabel.Text), double.Parse(weightEntry.Text), null);
+        repsEntry.Focus();
+    }
+
+    public async void OnWeightEntryUnfocused(object sender, EventArgs e)
+    {
+        WeightEntryCompleted(sender, e);
     }
 
     public async void RepsEntryCompleted(object sender, EventArgs e)
     {
         await App.SetRepository.UpdateSet(int.Parse(setIdLabel.Text), null, double.Parse(repsEntry.Text));
+    }
+
+    public async void OnRepsEntryUnfocused(object sender, EventArgs e)
+    {
+        RepsEntryCompleted(sender, e);
     }
 
 	public async void DeleteSetButtonClicked(object sender, EventArgs e)

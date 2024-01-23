@@ -15,11 +15,13 @@
             <Entry x:Name="weightEntry" Text="Test" WidthRequest="40"
                    Keyboard="Numeric"
                    Completed="WeightEntryCompleted"
+                   Unfocused="OnWeightEntryUnfocused"
                    Margin="0, 0, 5, 0"/>
             <Label x:Name="repLabel" Text="Reps:" />
             <Entry x:Name="repsEntry" Text="" WidthRequest="40"
                    Keyboard="Numeric"
-                   Completed="RepsEntryCompleted"/>
+                   Completed="RepsEntryCompleted"
+                   Unfocused="OnRepsEntryUnfocused"/>
             <Button x:Name="deleteSetButton" Text="Delete Set" Clicked="DeleteSetButtonClicked"
                     BackgroundColor="DarkRed" WidthRequest="70"
                     Margin="10, 0, 0, 0"

@@ -56,6 +56,21 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
 
         //Get current workoutId
         int workoutId = workouts.Where(w => w.Name == WorkoutTitle).Select(w => w.WorkoutId).FirstOrDefault();
+        //If WorkoutTitle is null, then display all exercises
+        if (WorkoutTitle == null)
+        {
+            this.Title = "All Exercises";
+            foreach (Exercise exercise in allExercises)
+            {
+                RowDefinition newExerciseRow = new RowDefinition { Height = GridLength.Auto };
+                int lastRow = exerciseGrid.RowDefinitions.Count - 1;
+                ExerciseComponent exerciseComponent = new ExerciseComponent(exercise.Name, WorkoutTitle);
+                //create new row definition
+                exerciseGrid.RowDefinitions.Add(newExerciseRow);
+                exerciseGrid.Add(exerciseComponent, 0, lastRow);
+            }
+            return;
+        }
         //Get list of exercises associated with the Id of current workout
         List<ExerciseWorkout> filteredWorkoutExercises = allExerciseWorkouts.Where(e => e.WorkoutId == workoutId).ToList();
 

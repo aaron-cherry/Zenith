@@ -22,6 +22,8 @@ public partial class SetComponent : ContentView
 
     public async void WeightEntryCompleted(object sender, EventArgs e)
     {
+        double weight;
+        weight = double.TryParse(weightEntry.Text , out weight) ? double.Parse(weightEntry.Text) : 0;
         await App.SetRepository.UpdateSet(int.Parse(setIdLabel.Text), double.Parse(weightEntry.Text), null);
         repsEntry.Focus();
     }
@@ -33,7 +35,9 @@ public partial class SetComponent : ContentView
 
     public async void RepsEntryCompleted(object sender, EventArgs e)
     {
-        await App.SetRepository.UpdateSet(int.Parse(setIdLabel.Text), null, double.Parse(repsEntry.Text));
+        double reps;
+        reps = double.TryParse(repsEntry.Text, out reps) ? double.Parse(repsEntry.Text) : 0;
+        await App.SetRepository.UpdateSet(int.Parse(setIdLabel.Text), null, reps);
     }
 
     public async void OnRepsEntryUnfocused(object sender, EventArgs e)

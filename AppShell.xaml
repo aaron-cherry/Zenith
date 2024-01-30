@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:WorkoutApp.Pages"
-    Shell.FlyoutBehavior="Disabled"
+    Shell.FlyoutBehavior="Flyout"
     Title="WorkoutApp">
     
     
@@ -14,6 +14,9 @@
         <ShellContent ContentTemplate="{DataTemplate local:WorkoutPage}"
                       Route="workout"/>
         <ShellContent ContentTemplate="{DataTemplate local:ExercisePage}" Route="exercise" />
+    </FlyoutItem>
+    <FlyoutItem Title="All Exercises" x:Name="allExercisesItem">
+        <ShellContent ContentTemplate="{DataTemplate local:WorkoutPage}" Route="workout"/>
     </FlyoutItem>
 
 </Shell>

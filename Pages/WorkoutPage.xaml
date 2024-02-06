@@ -28,6 +28,12 @@
                   BackgroundColor="Black">
             </Grid>
         </Border>
+        <Label x:Name="addExerciseLabel"
+                Text="Add Exercise"
+                FontSize="Small"
+                BackgroundColor="#1f1f1f"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"/>
         <Entry x:Name="exerciseEntry"
                 Placeholder="Enter exercise name"
                 Completed="Entry_Completed"

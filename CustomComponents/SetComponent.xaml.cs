@@ -47,6 +47,10 @@ public partial class SetComponent : ContentView
 
 	public async void DeleteSetButtonClicked(object sender, EventArgs e)
 	{
+        //Ask user if they are sure they want to delete the set
+        bool answer = await Application.Current.MainPage.DisplayAlert("Delete Set", "Are you sure you want to delete this set?", "Yes", "No");
+        if (!answer) return;
+
         try
         {
             //Prepare your eyes for some really hacky UI shit 

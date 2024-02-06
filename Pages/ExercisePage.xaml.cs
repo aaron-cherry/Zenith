@@ -113,8 +113,12 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
 
     private async void OnDeleteExButtonClicked(object sender, EventArgs e)
     {
+        //Ask user if they are sure they want to delete the exercise
+        bool answer = await DisplayAlert("Delete Exercise", "Are you sure you want to delete this exercise?", "Yes", "No");
+        if (!answer) return;
         //Edit deleteExercise method to search ExWorkout table for exerciseId and delete all rows with that exerciseId
         await App.ExerciseRepository.DeleteExercise(exerciseTitle.Text);
+        await Navigation.PopAsync();
         DisplayAlert("Exercise Deleted", $"{App.ExerciseRepository.StatusMessage}", "Ok");
     }
 }

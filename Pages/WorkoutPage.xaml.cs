@@ -139,30 +139,16 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
         }
     }
 
-    //private async void OnExerciseClicked (object sender, EventArgs e)
-    //{
-    //    Border currentBorder = (Border)sender;
-    //    Label borderLabel = (Label)currentBorder.Content;
-
-
-    //    //TODO: Figure out how to get exercise label text here(DONE)
-    //    string exerciseTitle = borderLabel.Text;
-    //    //exerciseTitle should be assigned the text of the label within the border view
-    //    Routing.RegisterRoute("exercise", typeof(ExercisePage));
-    //    await Shell.Current.GoToAsync($"exercise?exerciseTitle={exerciseTitle}&workoutTitle={WorkoutTitle}");
-    //}
 
     private async void deleteWorkoutClicked(object sender, EventArgs e)
     {
+        //Ask user if they are sure they want to delete the workout
+        bool answer = await DisplayAlert("Delete Workout", "Are you sure you want to delete this workout?", "Yes", "No");
+        if (!answer) return;
+
         await App.WorkoutRepository.deleteWorkout(workoutTitle.Text);
         DisplayAlert("Delete Button", $"{App.WorkoutRepository.StatusMessage}", "Cancel");
         //Go to previous page
         await Shell.Current.GoToAsync("..");
-    }
-
-    private string FormatLabelName(string exerciseName)
-    {
-        string formattedName = exerciseName.Replace(" ", "");
-        return formattedName;
     }
 }

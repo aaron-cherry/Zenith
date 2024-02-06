@@ -6,6 +6,7 @@ For now, I will be testing this in the gym myself and fix any issues I run into.
 
 ### Next Major Milestone
 - [ ] Field test time. Note any issues here
+- [ ] Add a PR page
 
 ### Next Minor Milestone
 - [ ] Some non-crucial quality-of-life improvements need to be implented. Will be generating a list and posting it here soon.

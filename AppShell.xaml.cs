@@ -8,6 +8,7 @@ namespace WorkoutApp
         {
             InitializeComponent();
             allExercisesItem.Route = $"{nameof(ExercisePage)}";
+            homeItem.Route = $"{nameof(HomePage)}";
         }
     }
 }

@@ -5,18 +5,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:WorkoutApp.Pages"
     Shell.FlyoutBehavior="Flyout"
-    Title="WorkoutApp">
+    Title="Zenith">
     
-    
-
-    <FlyoutItem Title="Home">
-        <ShellContent ContentTemplate="{DataTemplate local:HomePage}"/>
-        <ShellContent ContentTemplate="{DataTemplate local:WorkoutPage}"
-                      Route="workout"/>
-        <ShellContent ContentTemplate="{DataTemplate local:ExercisePage}" Route="exercise" />
+    <!--<ShellContent ContentTemplate="{DataTemplate local:WorkoutPage}"
+                    Route="workout"/>
+    <ShellContent ContentTemplate="{DataTemplate local:ExercisePage}" Route="exercise" />-->
+    <FlyoutItem Title="Home" x:Name="homeItem">
+        <ShellContent ContentTemplate="{DataTemplate local:HomePage}" Route="home" />
     </FlyoutItem>
     <FlyoutItem Title="All Exercises" x:Name="allExercisesItem">
         <ShellContent ContentTemplate="{DataTemplate local:WorkoutPage}" Route="workout"/>
     </FlyoutItem>
-
 </Shell>

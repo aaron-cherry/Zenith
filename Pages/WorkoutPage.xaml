@@ -9,53 +9,55 @@
             <Setter Property="Padding" Value="5" />
         </Style>
     </ContentPage.Resources>
-    <VerticalStackLayout>
-        <Border Background="{StaticResource TitleColor}">
-            <Label
-                x:Name="workoutTitle"
-                Text="{Binding WorkoutTitle}"
-                FontSize="{StaticResource TitleFontSize}"
-                Background="{StaticResource TitleColor}"
-                VerticalOptions="Center" 
-                HorizontalOptions="Center" />
-        </Border>
-        <!--Create a grid to hold exercises-->
-        <Border>
-            <Grid x:Name="exerciseGrid"
-                  ColumnDefinitions="1*"
-                  RowDefinitions="Auto"
-                  Padding="5"
-                  BackgroundColor="Black">
-            </Grid>
-        </Border>
-        <Label x:Name="addExerciseLabel"
-                Text="Add Exercise"
-                FontSize="Small"
-                BackgroundColor="#1f1f1f"
-                HorizontalOptions="Center"
-                VerticalOptions="Center"/>
-        <Entry x:Name="exerciseEntry"
-                Placeholder="Enter exercise name"
-                Completed="Entry_Completed"
-               Margin="10, 5, 10, 5">
-            <Entry.Keyboard>
-                <Keyboard x:FactoryMethod="Create">
-                    <!--FactoryMethod will not have an error when debugging on devices with a soft keyboard-->
-                    <x:Arguments>
-                        <KeyboardFlags>CapitalizeWord</KeyboardFlags>
-                    </x:Arguments>
-                </Keyboard>
-            </Entry.Keyboard>
-        </Entry>
-        <Button x:Name="deleteWorkout" Text="Delete Workout"
-                Clicked="deleteWorkoutClicked"
-                Margin="5"
-                WidthRequest="150"
-                BackgroundColor="DarkRed"/>
-        <Label x:Name="statusMessageLabel"
-               BackgroundColor="#1f1f1f"
-               Text=""
-               HorizontalOptions="Center"
-               VerticalOptions="Center"/>
-    </VerticalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout>
+            <Border Background="{StaticResource TitleColor}">
+                <Label
+                    x:Name="workoutTitle"
+                    Text="{Binding WorkoutTitle}"
+                    FontSize="{StaticResource TitleFontSize}"
+                    Background="{StaticResource TitleColor}"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Center" />
+            </Border>
+            <!--Create a grid to hold exercises-->
+            <Border>
+                <Grid x:Name="exerciseGrid"
+                      ColumnDefinitions="1*"
+                      RowDefinitions="Auto"
+                      Padding="5"
+                      BackgroundColor="Black">
+                </Grid>
+            </Border>
+            <Label x:Name="addExerciseLabel"
+                    Text="Add Exercise"
+                    FontSize="Small"
+                    BackgroundColor="#1f1f1f"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"/>
+            <Entry x:Name="exerciseEntry"
+                    Placeholder="Enter exercise name"
+                    Completed="Entry_Completed"
+                   Margin="10, 5, 10, 5">
+                <Entry.Keyboard>
+                    <Keyboard x:FactoryMethod="Create">
+                        <!--FactoryMethod will not have an error when debugging on devices with a soft keyboard-->
+                        <x:Arguments>
+                            <KeyboardFlags>CapitalizeWord</KeyboardFlags>
+                        </x:Arguments>
+                    </Keyboard>
+                </Entry.Keyboard>
+            </Entry>
+            <Button x:Name="deleteWorkout" Text="Delete Workout"
+                    Clicked="deleteWorkoutClicked"
+                    Margin="5"
+                    WidthRequest="150"
+                    BackgroundColor="DarkRed"/>
+            <Label x:Name="statusMessageLabel"
+                   BackgroundColor="#1f1f1f"
+                   Text=""
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"/>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

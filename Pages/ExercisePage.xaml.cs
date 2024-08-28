@@ -45,10 +45,9 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
         allSets = await App.SetRepository.GetAllSets();
         List<Set> currentExerciseSets = new List<Set>();
         List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
-        List<Exercise> exercises = await App.ExerciseRepository.GetAllExercises();
 
         //Get current exerciseId
-        int exerciseId = exercises.Where(e => e.Name == ExerciseTitle).Select(e => e.ExerciseId).FirstOrDefault();
+        int exerciseId = allExercises.Where(e => e.Name == ExerciseTitle).Select(e => e.ExerciseId).FirstOrDefault();
         //Get list of sets associated with the Id of current exercise
         List<Set> filteredExerciseSets = allSets.Where(s => s.ExerciseId == exerciseId).ToList();
 
@@ -80,8 +79,19 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
 
             //Add customComponents.SetComponent to column 1 in new row
             SetComponent setComponent = new SetComponent(set.SetId, set.Weight, set.Reps, setGrid.RowDefinitions.Count);
+            setComponent.SetChanged += OnSetChanged;
             setGrid.Add(setComponent, 1, lastRow);
         }
+        Exercise currentExercise = allExercises.Where(e => e.ExerciseId == exerciseId).FirstOrDefault();
+        lastPerformedLabel.Text = $"Last Performed: {currentExercise.LastPerformed}";
+    }
+
+    public async void OnSetChanged(object sender, EventArgs e)
+    {
+        List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
+        Exercise currentExercise = allExercises.Where(e => e.Name == ExerciseTitle).FirstOrDefault();
+        //Figure out why this isnt updating the 
+        lastPerformedLabel.Text = $"Last Performed: {currentExercise.LastPerformed}";
     }
 
     public async void OnAddSetButtonClicked(object sender, EventArgs e)
@@ -108,6 +118,7 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
         await App.SetRepository.AddSet(WorkoutTitle, ExerciseTitle, setGrid.RowDefinitions.Count);
         var set = await App.SetRepository.GetSet(WorkoutTitle, ExerciseTitle, setGrid.RowDefinitions.Count);
         SetComponent setComponent = new SetComponent(set.SetId, 0, 0, lastRow);
+        setComponent.SetChanged += OnSetChanged;
         setGrid.Add(setComponent, 1, lastRow);
     }
 

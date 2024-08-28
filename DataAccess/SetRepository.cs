@@ -148,6 +148,11 @@ namespace WorkoutApp.DataAccess
                     }
                     result = await conn.UpdateAsync(set);
                     StatusMessage = $"{result} records updated (Set ID: {setId})";
+                    //Also update lastPerformed for Exercise
+                    List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
+                    Exercise currentExercise = allExercises.Where(e => e.ExerciseId == set.ExerciseId).FirstOrDefault();
+                    currentExercise.LastPerformed = DateTime.Now.ToShortDateString();
+                    App.ExerciseRepository.UpdateExercise(currentExercise);
                 }
             }
             catch (Exception e)

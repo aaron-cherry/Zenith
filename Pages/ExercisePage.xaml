@@ -20,9 +20,15 @@
                 VerticalOptions="Center" 
                 HorizontalOptions="Center" />
         </Border>
-        <!--Put grid here to get input for what set the user wants to edit
-        then allow user to edit weight and reps for the set.
-        Also allow user to add set-->
+        <Border Background="{StaticResource TitleColor}">
+            <Label
+                x:Name="lastPerformedLabel"
+                FontSize="18"
+                TextColor="{StaticResource TitleTextColor}"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                />
+        </Border>
         <Border BackgroundColor="{StaticResource ComponentBgColor}">
             <Grid x:Name="setGrid"
                   ColumnDefinitions="1*, 5*"

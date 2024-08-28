@@ -68,6 +68,31 @@ namespace WorkoutApp.DataAccess
                 return null;
             }
         }
+
+        public async Task<Exercise> GetExerciseById(int id)
+        {
+            int result = 0;
+            try
+            {
+                Init();
+                List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
+                Exercise exercise = allExercises.FirstOrDefault(e => e.ExerciseId == id);
+                if (exercise != null)
+                {
+                    return exercise;
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
+            catch (Exception e)
+            {
+                StatusMessage = $"Error: {e.Message}";
+                return null;
+            }
+        }
         public async Task AddNewExercise(string exerciseName)
         {
             int result = 0;
@@ -121,21 +146,28 @@ namespace WorkoutApp.DataAccess
             }
         }
 
-        public async Task UpdateExercise(string exerciseName, string newName)
+        public async Task UpdateExercise(Exercise newExercise)
         {
             int result = 0;
             try
             {
                 await Init();
 
-                if (string.IsNullOrEmpty(exerciseName)) throw new Exception("Exercise name required");
-                result = await conn.UpdateAsync(new Exercise { Name = exerciseName });
+                //See if exercise doesn't exist yet
+                List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
+                Exercise exercise = allExercises.Where(e => e.ExerciseId == newExercise.ExerciseId).FirstOrDefault();
 
-                StatusMessage = $"{result} records updated (Exercise: {exerciseName})";
+                if (exercise != null)
+                {
+                    
+                    result = await conn.UpdateAsync(newExercise);
+                }
+
+                StatusMessage = $"{result} records updated (Exercise: {newExercise.Name})";
             }
             catch (Exception ex)
             {
-                StatusMessage = string.Format("Failed to update {0}. Error: {1}", exerciseName, ex.Message);
+                StatusMessage = string.Format("Failed to update {0}. Error: {1}", newExercise.Name, ex.Message);
             }
         }
 

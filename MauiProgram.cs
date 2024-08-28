@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using WorkoutApp.DataAccess;
+using WorkoutApp.Services;
 
 namespace WorkoutApp
 {
@@ -25,6 +26,7 @@ namespace WorkoutApp
             builder.Services.AddSingleton<ExerciseRepository>(s => ActivatorUtilities.CreateInstance<ExerciseRepository>(s, dbPath));
             builder.Services.AddSingleton<ExerciseWorkoutRepository>(s => ActivatorUtilities.CreateInstance<ExerciseWorkoutRepository>(s, dbPath));
             builder.Services.AddSingleton<SetRepository>(s => ActivatorUtilities.CreateInstance<SetRepository>(s, dbPath));
+            builder.Services.AddSingleton<DatabaseService>(s => ActivatorUtilities.CreateInstance<DatabaseService>(s, dbPath));
 
             return builder.Build();
         }

@@ -10,7 +10,7 @@ namespace WorkoutApp.Models
     [Table("ExerciseWorkout")]
     public class ExerciseWorkout
     {
-        [PrimaryKey]
+        //[PrimaryKey]
         public int ExerciseId { get; set; }
         public int WorkoutId { get; set; }
     }

@@ -15,6 +15,7 @@ namespace WorkoutApp.Models
         public int ExerciseId { get; set; }
         [MaxLength(50), Unique]
         public string Name { get; set; }
+        public string LastPerformed { get; set; }
         private List<Set> Sets { get; set; }
 
         public void AddSet(Set set)

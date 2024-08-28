@@ -4,6 +4,7 @@ namespace WorkoutApp.CustomComponents;
 
 public partial class SetComponent : ContentView
 {
+    public EventHandler SetChanged;
     private int GridRow { get; set; }
 	public SetComponent(int setId, double weight,double reps, int gridRow)
 	{
@@ -38,6 +39,9 @@ public partial class SetComponent : ContentView
         double reps;
         reps = double.TryParse(repsEntry.Text, out reps) ? double.Parse(repsEntry.Text) : 0;
         await App.SetRepository.UpdateSet(int.Parse(setIdLabel.Text), null, reps);
+
+        
+        SetChanged.Invoke(this, EventArgs.Empty);
     }
 
     public async void OnRepsEntryUnfocused(object sender, EventArgs e)

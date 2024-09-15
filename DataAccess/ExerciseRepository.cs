@@ -137,6 +137,11 @@ namespace WorkoutApp.DataAccess
                 await App.ExWorkRepo.DeleteExerciseWorkout(null, exercise.ExerciseId);
                 //Delete exercise from Exercise table
                 result = await conn.DeleteAsync(exercise);
+                //Delete all sets related to exercise
+                List<Set> allSets = await App.SetRepository.GetAllSets();
+                foreach (Set set in allSets) {
+                    if (set.ExerciseId == exercise.ExerciseId) App.SetRepository.DeleteSet(set.SetId);
+                }
 
                 StatusMessage = $"{result} records deleted (Exercise: {exerciseName})";
             }

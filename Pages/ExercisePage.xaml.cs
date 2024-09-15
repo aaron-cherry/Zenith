@@ -83,15 +83,30 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
             setGrid.Add(setComponent, 1, lastRow);
         }
         Exercise currentExercise = allExercises.Where(e => e.ExerciseId == exerciseId).FirstOrDefault();
-        lastPerformedLabel.Text = $"Last Performed: {currentExercise.LastPerformed}";
+        if (currentExercise.LastPerformed is null || currentExercise.LastPerformed == "0") currentExercise.LastPerformed = DateTime.Now.ToString();
+        DisplayDaysAgo(currentExercise.LastPerformed);
+    }
+
+    private void DisplayDaysAgo(string date)
+    {
+        DateTime lastPerformed;
+        if (DateTime.TryParse(date, out lastPerformed))
+        {
+            int daysAgo;
+            TimeSpan days = DateTime.Now - lastPerformed;
+            daysAgo = int.Parse(days.Days.ToString());
+
+            lastPerformedLabel.Text = daysAgo > 0 ? $"Last Performed {daysAgo} Days Ago" : $"Last Performed Today";
+            //lastPerformedLabel.Text = $"Last Performed {daysAgo} Days Ago";
+        }
+        else DisplayAlert("Alert", $"Couldn't display {date}", "ok");
     }
 
     public async void OnSetChanged(object sender, EventArgs e)
     {
         List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
         Exercise currentExercise = allExercises.Where(e => e.Name == ExerciseTitle).FirstOrDefault();
-        //Figure out why this isnt updating the 
-        lastPerformedLabel.Text = $"Last Performed: {currentExercise.LastPerformed}";
+        DisplayDaysAgo(currentExercise.LastPerformed);
     }
 
     public async void OnAddSetButtonClicked(object sender, EventArgs e)

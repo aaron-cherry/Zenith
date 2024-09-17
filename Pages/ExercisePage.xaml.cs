@@ -97,7 +97,7 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
             daysAgo = int.Parse(days.Days.ToString());
 
             lastPerformedLabel.Text = daysAgo > 0 ? $"Last Performed {daysAgo} Days Ago" : $"Last Performed Today";
-            //lastPerformedLabel.Text = $"Last Performed {daysAgo} Days Ago";
+            if (daysAgo == 1) lastPerformedLabel.Text = "Last Performed 1 Day Ago";
         }
         else DisplayAlert("Alert", $"Couldn't display {date}", "ok");
     }

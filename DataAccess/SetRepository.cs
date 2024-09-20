@@ -151,7 +151,7 @@ namespace WorkoutApp.DataAccess
                     //Also update lastPerformed for Exercise
                     List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
                     Exercise currentExercise = allExercises.Where(e => e.ExerciseId == set.ExerciseId).FirstOrDefault();
-                    currentExercise.LastPerformed = DateTime.Now.ToShortDateString();
+                    currentExercise.LastPerformed = DateTime.Now.ToString();
                     App.ExerciseRepository.UpdateExercise(currentExercise);
                 }
             }

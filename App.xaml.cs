@@ -1,5 +1,6 @@
 ﻿using WorkoutApp.Pages;
 using WorkoutApp.DataAccess;
+using WorkoutApp.Services;
 
 namespace WorkoutApp
 {
@@ -9,17 +10,23 @@ namespace WorkoutApp
         public static ExerciseRepository ExerciseRepository { get; set; }
         public static ExerciseWorkoutRepository ExWorkRepo { get; set; }
         public static SetRepository SetRepository { get; set; }
-        public App(WorkoutRepository workoutRepo, ExerciseRepository exerciseRepo, ExerciseWorkoutRepository exWorkRepo, SetRepository setRepo)
+        public static DatabaseService DatabaseService { get; set; }
+
+        public App(WorkoutRepository workoutRepo, ExerciseRepository exerciseRepo, ExerciseWorkoutRepository exWorkRepo, SetRepository setRepo, DatabaseService databaseService)
         {
             InitializeComponent();
 
             MainPage = new AppShell();
 
-            //Initialize all repository objects with WorkoutRepository singelton object
+            // Initialize all repository objects with WorkoutRepository singleton object
             ExWorkRepo = exWorkRepo;
             WorkoutRepository = workoutRepo;
             ExerciseRepository = exerciseRepo;
             SetRepository = setRepo;
+            DatabaseService = databaseService;
+
+            // Call the method to change the primary key
+            DatabaseService.ChangePrimaryKeyAsync();
         }
     }
 }

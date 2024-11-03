@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:customCompents="clr-namespace:WorkoutApp.CustomComponents"
              x:Class="WorkoutApp.Pages.ExercisePage"
-             Title="Exercise Page">
+             Title="Exercise Page"
+             HideSoftInputOnTapped="True"
+             Focused="exNote_Unfocused">
     <ContentPage.Resources>
         <Style TargetType="Label">
             <Setter Property="HorizontalOptions" Value="Center"/>
@@ -39,6 +41,14 @@
                 </customCompents:SetComponent>
             </Grid>
         </Border>
+        <Editor x:Name="exNote"
+                Placeholder="Enter any notes here"
+                HeightRequest="150"
+                Keyboard="Text"
+                Completed="ExNote_Completed"
+                Margin="10"/>
+        <Button Text="Save Note" Clicked="OnSaveButtonClicked" WidthRequest="100"
+                Margin="10, 5, 5, 5"/>
         <Button Text="Add Set" Clicked="OnAddSetButtonClicked" WidthRequest="100"
                 Margin="10, 5, 5, 5"/>
         <Button Text="Delete Exercise" Clicked="OnDeleteExButtonClicked" WidthRequest="150"

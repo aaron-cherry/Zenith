@@ -82,9 +82,14 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
             setComponent.SetChanged += OnSetChanged;
             setGrid.Add(setComponent, 1, lastRow);
         }
+
+        //Last performed calculations
         Exercise currentExercise = allExercises.Where(e => e.ExerciseId == exerciseId).FirstOrDefault();
         if (currentExercise.LastPerformed is null || currentExercise.LastPerformed == "0") currentExercise.LastPerformed = DateTime.Now.ToString();
         DisplayDaysAgo(currentExercise.LastPerformed);
+
+        //Notes
+        exNote.Text = "Example here";
     }
 
     private void DisplayDaysAgo(string date)
@@ -146,5 +151,22 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
         await App.ExerciseRepository.DeleteExercise(exerciseTitle.Text);
         await Navigation.PopAsync();
         DisplayAlert("Exercise Deleted", $"{App.ExerciseRepository.StatusMessage}", "Ok");
+    }
+
+    private void ExNote_Completed(object sender, EventArgs e)
+    {
+        DisplayAlert("Action", "Completed", "ok");
+    }
+
+    private void exNote_TextChanged(object sender, TextChangedEventArgs e)
+    {
+
+        DisplayAlert("Action", "TextChanged", "ok");
+
+    }
+
+    private void exNote_Unfocused(object sender, FocusEventArgs e)
+    {
+        DisplayAlert("Action", "Unfocused", "ok");
     }
 }

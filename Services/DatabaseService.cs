@@ -16,13 +16,6 @@ namespace WorkoutApp.Services
             _db = new SQLiteConnection(dbPath);
         }
 
-        public static async Task AddLastPerformedColumn()
-        {
-            await Task.Run(() =>
-            {
-
-            });
-        }
 
         public static async Task ChangePrimaryKeyAsync()
         {

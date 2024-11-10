@@ -50,12 +50,10 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
         string path = FileAccessHelper.GetLocalFilePath("zenith.db3");
         List<ExerciseWorkout> allExerciseWorkouts;
         List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
-        List<Exercise> currentWorkoutExercises = new List<Exercise>();
-        allExerciseWorkouts = await App.ExWorkRepo.GetExerciseWorkouts();
-        List<Workout> workouts = await App.WorkoutRepository.GetAllWorkouts();
 
         //Get current workoutId
-        int workoutId = workouts.Where(w => w.Name == WorkoutTitle).Select(w => w.WorkoutId).FirstOrDefault();
+        Workout workout = await App.WorkoutRepository.GetWorkout(WorkoutTitle);
+        int workoutId = workout.WorkoutId;
         //If WorkoutTitle is null, then display all exercises
         if (WorkoutTitle == null)
         {
@@ -72,12 +70,14 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
             return;
         }
         //Get list of exercises associated with the Id of current workout
+        allExerciseWorkouts = await App.ExWorkRepo.GetExerciseWorkouts();
         List<ExerciseWorkout> filteredWorkoutExercises = allExerciseWorkouts.Where(e => e.WorkoutId == workoutId).ToList();
+        List<Exercise> currentWorkoutExercises = new List<Exercise>();
 
         //Display all exercises associated with the current workout as ExerciseComponents
-        foreach (ExerciseWorkout exercise in filteredWorkoutExercises)
+        foreach (ExerciseWorkout exerciseWorkout in filteredWorkoutExercises)
         {
-            int exerciseId = exercise.ExerciseId;
+            int exerciseId = exerciseWorkout.ExerciseId;
             Exercise currentExercise = allExercises.Where(e => e.ExerciseId == exerciseId).FirstOrDefault();
             currentWorkoutExercises.Add(currentExercise);
         }

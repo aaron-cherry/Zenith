@@ -43,11 +43,10 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
         setGrid.Clear();
         string path = FileAccessHelper.GetLocalFilePath("zenith.db3");
         allSets = await App.SetRepository.GetAllSets();
-        List<Set> currentExerciseSets = new List<Set>();
-        List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
 
         //Get current exerciseId
-        int exerciseId = allExercises.Where(e => e.Name == ExerciseTitle).Select(e => e.ExerciseId).FirstOrDefault();
+        Exercise exercise = await App.ExerciseRepository.GetExercise(ExerciseTitle);
+        int exerciseId = exercise.ExerciseId;
         //Get list of sets associated with the Id of current exercise
         List<Set> filteredExerciseSets = allSets.Where(s => s.ExerciseId == exerciseId).ToList();
 
@@ -84,12 +83,13 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
         }
 
         //Last performed calculations
-        Exercise currentExercise = allExercises.Where(e => e.ExerciseId == exerciseId).FirstOrDefault();
+        //Exercise currentExercise = allExercises.Where(e => e.ExerciseId == exerciseId).FirstOrDefault();
+        Exercise currentExercise = await App.ExerciseRepository.GetExercise(ExerciseTitle);
         if (currentExercise.LastPerformed is null || currentExercise.LastPerformed == "0") currentExercise.LastPerformed = DateTime.Now.ToString();
         DisplayDaysAgo(currentExercise.LastPerformed);
 
         //Notes
-        exNote.Text = "Example here";
+        exerciseNote.Text = currentExercise.Note;
     }
 
     private void DisplayDaysAgo(string date)
@@ -109,8 +109,9 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
 
     public async void OnSetChanged(object sender, EventArgs e)
     {
-        List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
-        Exercise currentExercise = allExercises.Where(e => e.Name == ExerciseTitle).FirstOrDefault();
+        //List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
+        //Exercise currentExercise = allExercises.Where(e => e.Name == ExerciseTitle).FirstOrDefault();
+        Exercise currentExercise = await App.ExerciseRepository.GetExercise(ExerciseTitle);
         DisplayDaysAgo(currentExercise.LastPerformed);
     }
 
@@ -153,11 +154,6 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
         DisplayAlert("Exercise Deleted", $"{App.ExerciseRepository.StatusMessage}", "Ok");
     }
 
-    private void ExNote_Completed(object sender, EventArgs e)
-    {
-        DisplayAlert("Action", "Completed", "ok");
-    }
-
     private void exNote_TextChanged(object sender, TextChangedEventArgs e)
     {
 
@@ -165,8 +161,17 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
 
     }
 
-    private void exNote_Unfocused(object sender, FocusEventArgs e)
+    private async void OnSaveButtonClicked(object sender, EventArgs e)
     {
-        DisplayAlert("Action", "Unfocused", "ok");
+        string content = exerciseNote.Text;
+        Exercise currentExercise = await App.ExerciseRepository.GetExercise(ExerciseTitle);
+        currentExercise.Note = content; 
+
+        await App.ExerciseRepository.UpdateExercise(currentExercise);
+
+        DisplayAlert("Saved", "Note saved", "Ok");
+
+        Console.WriteLine("save button");
     }
+
 }

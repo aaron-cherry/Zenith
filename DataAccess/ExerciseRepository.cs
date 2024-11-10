@@ -159,12 +159,12 @@ namespace WorkoutApp.DataAccess
                 await Init();
 
                 //See if exercise doesn't exist yet
-                List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
-                Exercise exercise = allExercises.Where(e => e.ExerciseId == newExercise.ExerciseId).FirstOrDefault();
+                //List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
+                //Exercise exercise = allExercises.Where(e => e.ExerciseId == newExercise.ExerciseId).FirstOrDefault();
+                Exercise exercise = await GetExerciseById(newExercise.ExerciseId);
 
                 if (exercise != null)
                 {
-                    
                     result = await conn.UpdateAsync(newExercise);
                 }
 

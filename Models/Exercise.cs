@@ -17,7 +17,7 @@ namespace WorkoutApp.Models
         public string Name { get; set; }
         public string LastPerformed { get; set; }
         private List<Set> Sets { get; set; }
-
+        public string Note { get; set; }
         public void AddSet(Set set)
         {
             Sets.Add(set);

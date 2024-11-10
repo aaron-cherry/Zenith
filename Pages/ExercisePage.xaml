@@ -4,8 +4,7 @@
              xmlns:customCompents="clr-namespace:WorkoutApp.CustomComponents"
              x:Class="WorkoutApp.Pages.ExercisePage"
              Title="Exercise Page"
-             HideSoftInputOnTapped="True"
-             Focused="exNote_Unfocused">
+             HideSoftInputOnTapped="True">
     <ContentPage.Resources>
         <Style TargetType="Label">
             <Setter Property="HorizontalOptions" Value="Center"/>
@@ -41,11 +40,10 @@
                 </customCompents:SetComponent>
             </Grid>
         </Border>
-        <Editor x:Name="exNote"
+        <Editor x:Name="exerciseNote"
                 Placeholder="Enter any notes here"
                 HeightRequest="150"
                 Keyboard="Text"
-                Completed="ExNote_Completed"
                 Margin="10"/>
         <Button Text="Save Note" Clicked="OnSaveButtonClicked" WidthRequest="100"
                 Margin="10, 5, 5, 5"/>

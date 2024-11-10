@@ -83,7 +83,6 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
         }
 
         //Last performed calculations
-        //Exercise currentExercise = allExercises.Where(e => e.ExerciseId == exerciseId).FirstOrDefault();
         Exercise currentExercise = await App.ExerciseRepository.GetExercise(ExerciseTitle);
         if (currentExercise.LastPerformed is null || currentExercise.LastPerformed == "0") currentExercise.LastPerformed = DateTime.Now.ToString();
         DisplayDaysAgo(currentExercise.LastPerformed);
@@ -109,8 +108,6 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
 
     public async void OnSetChanged(object sender, EventArgs e)
     {
-        //List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
-        //Exercise currentExercise = allExercises.Where(e => e.Name == ExerciseTitle).FirstOrDefault();
         Exercise currentExercise = await App.ExerciseRepository.GetExercise(ExerciseTitle);
         DisplayDaysAgo(currentExercise.LastPerformed);
     }

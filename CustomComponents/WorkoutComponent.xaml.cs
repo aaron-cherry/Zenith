@@ -13,6 +13,7 @@ public partial class WorkoutComponent : ContentView
     }
     private async void OnWorkoutClicked(object sender, EventArgs e)
     {
+        HapticFeedback.Default.Perform(HapticFeedbackType.LongPress);
         string workoutTitle = workoutName.Text;
         Routing.RegisterRoute("workout", typeof(WorkoutPage));
         await Shell.Current.GoToAsync($"workout?workoutTitle={workoutTitle}");

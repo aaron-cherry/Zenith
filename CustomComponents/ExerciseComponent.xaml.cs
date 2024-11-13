@@ -7,6 +7,7 @@ public partial class ExerciseComponent : ContentView
     public string CurrentWorkoutTitle { get; set; }
     public async void ExerciseTapped(object sender, EventArgs e)
     {
+        HapticFeedback.Default.Perform(HapticFeedbackType.LongPress);
         //We need to get the current workout here
         string exerciseTitle = exerciseName.Text;
         Routing.RegisterRoute("exercise", typeof(ExercisePage));

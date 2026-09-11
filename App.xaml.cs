@@ -26,7 +26,7 @@ namespace WorkoutApp
             DatabaseService = databaseService;
 
             // Call the method to change the primary key
-            DatabaseService.ChangePrimaryKeyAsync();
+            //DatabaseService.ChangePrimaryKeyAsync();
         }
     }
 }

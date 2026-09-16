@@ -1,6 +1,7 @@
-using WorkoutApp.Models;
-using WorkoutApp.DataAccess;
 using WorkoutApp.CustomComponents;
+using WorkoutApp.DataAccess;
+using WorkoutApp.Models;
+using WorkoutApp.Services;
 
 namespace WorkoutApp.Pages;
 
@@ -14,6 +15,27 @@ public partial class HomePage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        //ZenithAPI smoke test ping
+        try
+        {
+            using var client = NetworkService.CreateClient();
+            var response = await client.GetAsync("api/workouts");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                await DisplayAlert("Network Success!", $"Connected to API!\nWorkouts: {content}", "Let's Go!");
+            }
+            else
+            {
+                await DisplayAlert("HTTP Error", $"Status code: {response.StatusCode}", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Connection Failed", ex.Message, "OK");
+        }
+
         //Db access and retrieve list
         try
         {

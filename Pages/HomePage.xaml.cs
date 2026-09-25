@@ -31,7 +31,11 @@ public partial class HomePage : ContentPage
 
             foreach (var workout in allWorkouts)
             {
-                WorkoutComponent workoutComponent = new WorkoutComponent() { WorkoutName = workout.Name };
+                var workoutComponent = new WorkoutComponent
+                {
+                    WorkoutId = workout.WorkoutId,
+                    WorkoutName = workout.Name
+                };
                 workoutStackLayout.Add(workoutComponent);
             }
         }
@@ -64,13 +68,17 @@ public partial class HomePage : ContentPage
         //create new workout component and add it to the UI/register the page route
         if (createdWorkout != null)
         {
-            var workoutComponent = new WorkoutComponent { WorkoutName = createdWorkout.Name };
+            var workoutComponent = new WorkoutComponent
+            {
+                WorkoutId = createdWorkout.WorkoutId,
+                WorkoutName = createdWorkout.Name
+            };
             workoutStackLayout.Add(workoutComponent);
 
             Routing.RegisterRoute("workout", typeof(WorkoutPage));
-            await Shell.Current.GoToAsync($"workout?workoutTitle={workoutTitle}");
+            await Shell.Current.GoToAsync($"workout?workoutId={createdWorkout.WorkoutId}&workoutTitle={createdWorkout.Name}");
         }
-        
+
         workoutEntry.IsVisible = false;
         workoutTitleEntry.Text = string.Empty;
     }

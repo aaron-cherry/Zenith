@@ -1,154 +1,104 @@
 using System.Web;
-using WorkoutApp.DataAccess;
-using WorkoutApp.Models;
 using WorkoutApp.CustomComponents;
-using SQLite;
-using Microsoft.Maui.Controls;
+using WorkoutApp.Models;
+using WorkoutApp.Services;
 
 namespace WorkoutApp.Pages;
 
+[QueryProperty(nameof(WorkoutId), "workoutId")]
 [QueryProperty(nameof(WorkoutTitle), "workoutTitle")]
 public partial class WorkoutPage : ContentPage, IQueryAttributable
 {
-	public string? WorkoutTitle { get; set; }
-    private Workout workout;
-	public WorkoutPage()
-	{
-		InitializeComponent();
+    private readonly ApiService _apiService;
+    public int WorkoutId { get; set; }
+    public string? WorkoutTitle { get; set; }
+
+    public WorkoutPage()
+    {
+        InitializeComponent();
+        _apiService = new ApiService();
         BindingContext = this;
-        workout = new Workout();
     }
+
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        WorkoutTitle = HttpUtility.UrlDecode(query["workoutTitle"].ToString());
-        // Use LabelText here
-        workoutTitle.Text = WorkoutTitle;
-
-        // Create a new Workout object
-        workout = new Workout
+        if (query.TryGetValue("workoutId", out var idObj) && int.TryParse(idObj.ToString(), out int parsedId))
         {
-            Name = WorkoutTitle
-        };
+            WorkoutId = parsedId;
+        }
+
+        if (query.TryGetValue("workoutTitle", out var titleObj))
+        {
+            WorkoutTitle = HttpUtility.UrlDecode(titleObj.ToString());
+            workoutTitle.Text = WorkoutTitle;
+        }
     }
 
     protected override async void OnAppearing()
     {
-        try
-        {
-            DisplayExercises();
-        }
-        catch (Exception e)
-        {
-            await DisplayAlert("Database Error", $"{e.Message}", "Ok");
-        }
         base.OnAppearing();
-
+        await DisplayExercisesAsync();
     }
-    private async void DisplayExercises()
+
+    private async Task DisplayExercisesAsync()
     {
         exerciseGrid.Clear();
-        string path = FileAccessHelper.GetLocalFilePath("zenith.db3");
-        List<ExerciseWorkout> allExerciseWorkouts;
-        List<Exercise> allExercises = await App.ExerciseRepository.GetAllExercises();
+        exerciseGrid.RowDefinitions.Clear();
 
-        //Get current workoutId
-        Workout workout = await App.WorkoutRepository.GetWorkout(WorkoutTitle);
-        int workoutId = workout.WorkoutId;
-        //If WorkoutTitle is null, then display all exercises
-        if (WorkoutTitle == null)
-        {
-            this.Title = "All Exercises";
-            foreach (Exercise exercise in allExercises)
-            {
-                RowDefinition newExerciseRow = new RowDefinition { Height = GridLength.Auto };
-                int lastRow = exerciseGrid.RowDefinitions.Count - 1;
-                ExerciseComponent exerciseComponent = new ExerciseComponent(exercise.Name, WorkoutTitle);
-                //create new row definition
-                exerciseGrid.RowDefinitions.Add(newExerciseRow);
-                exerciseGrid.Add(exerciseComponent, 0, lastRow);
-            }
-            return;
-        }
-        //Get list of exercises associated with the Id of current workout
-        allExerciseWorkouts = await App.ExWorkRepo.GetExerciseWorkouts();
-        List<ExerciseWorkout> filteredWorkoutExercises = allExerciseWorkouts.Where(e => e.WorkoutId == workoutId).ToList();
-        List<Exercise> currentWorkoutExercises = new List<Exercise>();
+        if (WorkoutId <= 0) return;
 
-        //Display all exercises associated with the current workout as ExerciseComponents
-        foreach (ExerciseWorkout exerciseWorkout in filteredWorkoutExercises)
-        {
-            int exerciseId = exerciseWorkout.ExerciseId;
-            Exercise currentExercise = allExercises.Where(e => e.ExerciseId == exerciseId).FirstOrDefault();
-            currentWorkoutExercises.Add(currentExercise);
-        }
+        var exercises = await _apiService.GetExercisesForWorkoutAsync(WorkoutId);
 
-        foreach (Exercise exercise in currentWorkoutExercises)
+        foreach (var exercise in exercises)
         {
             RowDefinition newExerciseRow = new RowDefinition { Height = GridLength.Auto };
-            int lastRow = exerciseGrid.RowDefinitions.Count - 1;
-            ExerciseComponent exerciseComponent = new ExerciseComponent(exercise.Name, WorkoutTitle);
-            //create new row definition
             exerciseGrid.RowDefinitions.Add(newExerciseRow);
+            int lastRow = exerciseGrid.RowDefinitions.Count - 1;
+
+            ExerciseComponent exerciseComponent = new ExerciseComponent(exercise.Name, WorkoutTitle);
             exerciseGrid.Add(exerciseComponent, 0, lastRow);
         }
     }
 
     private async void Entry_Completed(object sender, EventArgs e)
     {
-        string exerciseName = exerciseEntry.Text;
-        
-        // Add exercise to the workout object
-        if (exerciseName == null)
+        string exerciseName = exerciseEntry.Text?.Trim() ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(exerciseName))
         {
-            DisplayAlert("Error", "Exercise name cannot be blank", "OK");
+            await DisplayAlert("Error", "Exercise name cannot be blank", "OK");
+            return;
+        }
+
+        var created = await _apiService.AddExerciseToWorkoutAsync(WorkoutId, exerciseName);
+        if (created != null)
+        {
+            statusMessageLabel.Text = $"Added {created.Name}";
+            await DisplayExercisesAsync();
         }
         else
         {
-            Exercise exercise = new Exercise { Name = exerciseName };
-            workout.AddExercise(exercise);
+            statusMessageLabel.Text = "Failed to add exercise.";
         }
 
-        //Let's add the exercise to the ExerciseWorkout table
-        await AddExerciseToDb(exerciseEntry.Text);
-        statusMessageLabel.Text = $"{App.ExWorkRepo.StatusMessage}";
-        DisplayExercises();
-
-        //Refocus back to exerciseEntry and clear text
-        exerciseEntry.Text = "";
+        exerciseEntry.Text = string.Empty;
         exerciseEntry.Focus();
     }
 
-    private async Task AddExerciseToDb(string exTitle)
-    {
-        try
-        {
-            //await App.ExerciseRepository.AddNewExercise(exTitle);
-
-            //Get id's of current workout and exercise
-            List<Workout> workouts = await App.WorkoutRepository.GetAllWorkouts();
-            int workoutId = workouts.Where(w => w.Name == WorkoutTitle).Select(w => w.WorkoutId).FirstOrDefault();
-            
-            //Add to corresponding dbs
-            await App.ExWorkRepo.AddNewExerciseWorkout(exTitle, workoutId);
-
-            statusMessageLabel.Text = $"{App.ExWorkRepo.StatusMessage}";
-        }
-        catch(Exception e)
-        {
-            await DisplayAlert("DbError", $"{e.Message}", "Ok");
-        }
-    }
-
-
     private async void deleteWorkoutClicked(object sender, EventArgs e)
     {
-        //Ask user if they are sure they want to delete the workout
         bool answer = await DisplayAlert("Delete Workout", "Are you sure you want to delete this workout?", "Yes", "No");
         if (!answer) return;
 
-        await App.WorkoutRepository.deleteWorkout(workoutTitle.Text);
-        DisplayAlert("Delete Button", $"{App.WorkoutRepository.StatusMessage}", "Cancel");
-        //Go to previous page
-        await Shell.Current.GoToAsync("..");
+        bool success = await _apiService.DeleteWorkoutAsync(WorkoutId);
+        if (success)
+        {
+            await DisplayAlert("Success", "Workout deleted", "OK");
+            await Shell.Current.GoToAsync("..");
+        }
+        else
+        {
+            await DisplayAlert("Error", "Failed to delete workout.", "OK");
+        }
     }
 }

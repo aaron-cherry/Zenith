@@ -64,5 +64,40 @@ namespace WorkoutApp.Services
                 return false;
             }
         }
+
+        //Exercises
+        public async Task<List<Exercise>> GetExercisesForWorkoutAsync(int workoutId)
+        {
+            try
+            {
+                var exercises = await _httpClient.GetFromJsonAsync<List<Exercise>>($"api/workouts/{workoutId}/exercises");
+                return exercises ?? new List<Exercise>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching exercises: {ex.Message}");
+                return new List<Exercise>();
+            }
+        }
+
+        public async Task<Exercise?> AddExerciseToWorkoutAsync(int workoutId, string exerciseName)
+        {
+            try
+            {
+                var payload = new { Name = exerciseName };
+                var response = await _httpClient.PostAsJsonAsync($"api/workouts/{workoutId}/exercises/", payload);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<Exercise>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding exercise to workout: {ex.Message}");
+            }
+
+            return null;
+        }
     }
 }

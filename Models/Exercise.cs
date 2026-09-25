@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using SQLite;
 
@@ -12,6 +13,7 @@ namespace WorkoutApp.Models
     {
         //Properties to create: Name, Sets, Reps, Weight
         [PrimaryKey, AutoIncrement]
+        [JsonPropertyName("id")]
         public int ExerciseId { get; set; }
         [MaxLength(50), Unique]
         public string Name { get; set; }

@@ -161,5 +161,61 @@ namespace WorkoutApp.Services
                 return false;
             }
         }
+
+        public async Task<bool> DeleteExerciseFromWorkoutAsync(int workoutId, int exerciseId)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"api/workouts/{workoutId}/exercises/{exerciseId}");
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting exercise: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteLogAsync(int workoutId, int exerciseId, int logId)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"api/workouts/{workoutId}/exercises/{exerciseId}/logs/{logId}");
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting set log: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<Exercise?> GetExerciseAsync(int workoutId, int exerciseId)
+        {
+            try
+            {
+                return await _httpClient.GetFromJsonAsync<Exercise>($"api/workouts/{workoutId}/exercises/{exerciseId}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching exercise: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<bool> UpdateExerciseAsync(int workoutId, int exerciseId, string name, string note)
+        {
+            try
+            {
+                var payload = new { Name = name, Note = note };
+                var response = await _httpClient.PutAsJsonAsync($"api/workouts/{workoutId}/exercises/{exerciseId}", payload);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating exercise: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

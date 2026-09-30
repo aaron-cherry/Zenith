@@ -49,6 +49,18 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
     {
         base.OnAppearing();
         await DisplaySetsAsync();
+        await LoadExerciseDetailsAsync();
+    }
+
+    private async Task LoadExerciseDetailsAsync()
+    {
+        if (WorkoutId <= 0 || ExerciseId <= 0) return;
+
+        var exercise = await _apiService.GetExerciseAsync(WorkoutId, ExerciseId);
+        if (exercise != null)
+        {
+            exerciseNote.Text = exercise.Note;
+        }
     }
 
     private async Task DisplaySetsAsync()
@@ -82,6 +94,7 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
 
             var setComponent = new SetComponent(log.Id, WorkoutId, ExerciseId, log.SetNumber, weight, reps, lastRow);
             setComponent.SetChanged += OnSetChanged;
+            setComponent.SetDeleted += async (s, e) => await DisplaySetsAsync();
             setGrid.Add(setComponent, 1, lastRow);
         }
 
@@ -121,11 +134,43 @@ public partial class ExercisePage : ContentPage, IQueryAttributable
 
     private async void OnDeleteExButtonClicked(object sender, EventArgs e)
     {
-        await DisplayAlert("Notice", "Exercise deletion will be wired up next.", "OK");
+        bool answer = await DisplayAlert(
+            "Delete Exercise",
+            $"Are you sure you want to remove {ExerciseTitle} from this workout?",
+            "Yes",
+            "No");
+
+        if (!answer) return;
+
+        if (WorkoutId > 0 && ExerciseId > 0)
+        {
+            bool success = await _apiService.DeleteExerciseFromWorkoutAsync(WorkoutId, ExerciseId);
+            if (success)
+            {
+                await DisplayAlert("Success", "Exercise removed.", "OK");
+                await Shell.Current.GoToAsync("..");
+            }
+            else
+            {
+                await DisplayAlert("Error", "Failed to delete exercise from server.", "OK");
+            }
+        }
     }
 
     private async void OnSaveButtonClicked(object sender, EventArgs e)
     {
-        await DisplayAlert("Saved", "Note functionality will be connected with the API.", "OK");
+        if (WorkoutId <= 0 || ExerciseId <= 0) return;
+
+        string content = exerciseNote.Text?.Trim() ?? string.Empty;
+        bool success = await _apiService.UpdateExerciseAsync(WorkoutId, ExerciseId, ExerciseTitle ?? string.Empty, content);
+
+        if (success)
+        {
+            await DisplayAlert("Saved", "Note saved successfully.", "OK");
+        }
+        else
+        {
+            await DisplayAlert("Error", "Failed to save note to server.", "OK");
+        }
     }
 }

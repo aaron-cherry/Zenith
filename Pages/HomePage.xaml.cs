@@ -6,7 +6,7 @@ namespace WorkoutApp.Pages;
 
 public partial class HomePage : ContentPage
 {
-    private readonly ApiService _apiService = new ApiService();
+    private readonly ApiService _apiService;
 	public HomePage()
 	{
 		InitializeComponent();

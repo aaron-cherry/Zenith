@@ -7,6 +7,7 @@ public partial class SetComponent : ContentView
     private readonly ApiService _apiService = new ApiService();
 
     public EventHandler? SetChanged;
+    public event EventHandler? SetDeleted;
 
     public int LogId { get; set; }
     public int WorkoutId { get; set; }
@@ -75,6 +76,27 @@ public partial class SetComponent : ContentView
 
     public async void DeleteSetButtonClicked(object sender, EventArgs e)
     {
-        await Application.Current.MainPage.DisplayAlert("Notice", "Set deletion will be connected to the API next.", "OK");
+        if (Application.Current?.MainPage == null) return;
+
+        bool answer = await Application.Current.MainPage.DisplayAlert(
+            "Delete Set",
+            $"Are you sure you want to delete Set {SetNumber}?",
+            "Yes",
+            "No");
+
+        if (!answer) return;
+
+        if (WorkoutId > 0 && ExerciseId > 0 && LogId > 0)
+        {
+            bool success = await _apiService.DeleteLogAsync(WorkoutId, ExerciseId, LogId);
+            if (success)
+            {
+                SetDeleted?.Invoke(this, EventArgs.Empty);
+            }
+            else
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Failed to delete set from server.", "OK");
+            }
+        }
     }
 }

@@ -1,174 +1,131 @@
 using System.Web;
-using WorkoutApp.Models;
 using WorkoutApp.CustomComponents;
+using WorkoutApp.Models;
+using WorkoutApp.Services;
 
 namespace WorkoutApp.Pages;
 
+[QueryProperty(nameof(ExerciseId), "exerciseId")]
+[QueryProperty(nameof(WorkoutId), "workoutId")]
 [QueryProperty(nameof(ExerciseTitle), "exerciseTitle")]
 [QueryProperty(nameof(WorkoutTitle), "workoutTitle")]
 public partial class ExercisePage : ContentPage, IQueryAttributable
 {
+    private readonly ApiService _apiService;
+
+    public int ExerciseId { get; set; }
+    public int WorkoutId { get; set; }
     public string? ExerciseTitle { get; set; }
     public string? WorkoutTitle { get; set; }
-    private static List<Set> allSets;
+
     public ExercisePage()
     {
         InitializeComponent();
+        _apiService = new ApiService();
         BindingContext = this;
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        ExerciseTitle = HttpUtility.UrlDecode(query["exerciseTitle"].ToString());
-        WorkoutTitle = HttpUtility.UrlDecode(query["workoutTitle"].ToString());
-        // Use LabelText here
-        exerciseTitle.Text = ExerciseTitle;
+        if (query.TryGetValue("exerciseId", out var exId) && int.TryParse(exId.ToString(), out int parsedExId))
+            ExerciseId = parsedExId;
+
+        if (query.TryGetValue("workoutId", out var wId) && int.TryParse(wId.ToString(), out int parsedWId))
+            WorkoutId = parsedWId;
+
+        if (query.TryGetValue("exerciseTitle", out var exTitle))
+        {
+            ExerciseTitle = HttpUtility.UrlDecode(exTitle.ToString());
+            exerciseTitle.Text = ExerciseTitle;
+        }
+
+        if (query.TryGetValue("workoutTitle", out var wTitle))
+        {
+            WorkoutTitle = HttpUtility.UrlDecode(wTitle.ToString());
+        }
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        try
-        {
-            DisplaySets();
-        }
-        catch (Exception e)
-        {
-            DisplayAlert("Database Error", $"{e.Message}", "Ok");
-        }
+        await DisplaySetsAsync();
     }
 
-    private async void DisplaySets()
+    private async Task DisplaySetsAsync()
     {
         setGrid.Clear();
-        string path = FileAccessHelper.GetLocalFilePath("zenith.db3");
-        allSets = await App.SetRepository.GetAllSets();
+        setGrid.RowDefinitions.Clear();
 
-        //Get current exerciseId
-        Exercise exercise = await App.ExerciseRepository.GetExercise(ExerciseTitle);
-        int exerciseId = exercise.ExerciseId;
-        //Get list of sets associated with the Id of current exercise
-        List<Set> filteredExerciseSets = allSets.Where(s => s.ExerciseId == exerciseId).ToList();
+        if (WorkoutId <= 0 || ExerciseId <= 0) return;
 
-        //Order sets by setNumber
-        filteredExerciseSets = filteredExerciseSets.OrderBy(s => s.SetNumber).ToList();
+        var logs = await _apiService.GetLogsAsync(WorkoutId, ExerciseId);
 
-        //Add all sets associated with current exercise to setGrid
-        foreach (Set set in filteredExerciseSets)
+        foreach (var log in logs)
         {
-            //Create new row definition
             RowDefinition newSetRow = new RowDefinition { Height = GridLength.Auto };
-            //Add new row definition to grid
             setGrid.RowDefinitions.Add(newSetRow);
-            //Create new set label based on number of rows in grid
+
+            int lastRow = setGrid.RowDefinitions.Count - 1;
+
             var newSetLabel = new Label
             {
-                Text = $"Set {setGrid.RowDefinitions.Count}",
+                Text = $"Set {log.SetNumber}",
                 VerticalOptions = LayoutOptions.Center,
                 HorizontalOptions = LayoutOptions.Center,
                 Margin = 10
             };
-
-
-
-            //Find last row in setGrid and add newSetLabel to the first column
-            int lastRow = setGrid.RowDefinitions.Count - 1;
-            //Create new set label based on number of rows in grid
             setGrid.Add(newSetLabel, 0, lastRow);
 
-            //Add customComponents.SetComponent to column 1 in new row
-            SetComponent setComponent = new SetComponent(set.SetId, set.Weight, set.Reps, setGrid.RowDefinitions.Count);
+            // Pull reps and weight from JSONB dictionary (defaulting to 0 if absent)
+            log.Metrics.TryGetValue("weight", out double weight);
+            log.Metrics.TryGetValue("reps", out double reps);
+
+            var setComponent = new SetComponent(log.Id, WorkoutId, ExerciseId, log.SetNumber, weight, reps, lastRow);
             setComponent.SetChanged += OnSetChanged;
             setGrid.Add(setComponent, 1, lastRow);
         }
 
-        //Last performed calculations
-        Exercise currentExercise = await App.ExerciseRepository.GetExercise(ExerciseTitle);
-        if (currentExercise.LastPerformed is null || currentExercise.LastPerformed == "0") currentExercise.LastPerformed = DateTime.Now.ToString();
-        DisplayDaysAgo(currentExercise.LastPerformed);
-
-        //Notes
-        exerciseNote.Text = currentExercise.Note;
+        lastPerformedLabel.Text = logs.Count > 0
+            ? $"Last logged: {logs.Max(l => l.CompletedAt).ToLocalTime():MM/dd/yyyy}"
+            : "No sets recorded yet";
     }
 
-    private void DisplayDaysAgo(string date)
+    private void OnSetChanged(object? sender, EventArgs e)
     {
-        DateTime lastPerformed;
-        if (DateTime.TryParse(date, out lastPerformed))
-        {
-            int daysAgo;
-            TimeSpan days = DateTime.Now - lastPerformed;
-            daysAgo = int.Parse(days.Days.ToString());
-
-            lastPerformedLabel.Text = daysAgo > 0 ? $"Last Performed {daysAgo} Days Ago" : $"Last Performed Today";
-            if (daysAgo == 1) lastPerformedLabel.Text = "Last Performed 1 Day Ago";
-        }
-        else DisplayAlert("Alert", $"Couldn't display {date}", "ok");
-    }
-
-    public async void OnSetChanged(object sender, EventArgs e)
-    {
-        Exercise currentExercise = await App.ExerciseRepository.GetExercise(ExerciseTitle);
-        DisplayDaysAgo(currentExercise.LastPerformed);
+        // Updates label timestamp when a set finishes saving
+        lastPerformedLabel.Text = $"Last logged: {DateTime.Now:MM/dd/yyyy}";
     }
 
     public async void OnAddSetButtonClicked(object sender, EventArgs e)
     {
-        //Create new row definition
-        RowDefinition newSetRow = new RowDefinition { 
-            Height = GridLength.Auto };
-        //Add new row definition to grid
-        setGrid.RowDefinitions.Add(newSetRow);
+        int nextSetNumber = setGrid.RowDefinitions.Count + 1;
 
-        //Create new set label based on number of rows in grid
-        var newSetLabel = new Label
+        // Default set metrics dictionary
+        var initialMetrics = new Dictionary<string, double>
         {
-            Text = $"Set {setGrid.RowDefinitions.Count}",
-            VerticalOptions = LayoutOptions.Center,
-            HorizontalOptions = LayoutOptions.Center,
-            Margin = 10
+            { "weight", 0 },
+            { "reps", 0 }
         };
-        //Find last row in setGrid and add newSetLabel to the first column
-        int lastRow = setGrid.RowDefinitions.Count - 1;
-        setGrid.Add(newSetLabel, 0, lastRow);
 
-        //Add customComponents.SetComponent to column 1 in new row
-        await App.SetRepository.AddSet(WorkoutTitle, ExerciseTitle, setGrid.RowDefinitions.Count);
-        var set = await App.SetRepository.GetSet(WorkoutTitle, ExerciseTitle, setGrid.RowDefinitions.Count);
-        SetComponent setComponent = new SetComponent(set.SetId, 0, 0, lastRow);
-        setComponent.SetChanged += OnSetChanged;
-        setGrid.Add(setComponent, 1, lastRow);
+        var createdLog = await _apiService.CreateLogAsync(WorkoutId, ExerciseId, nextSetNumber, initialMetrics);
+
+        if (createdLog != null)
+        {
+            await DisplaySetsAsync();
+        }
+        else
+        {
+            await DisplayAlert("Error", "Failed to add set to database.", "OK");
+        }
     }
 
     private async void OnDeleteExButtonClicked(object sender, EventArgs e)
     {
-        //Ask user if they are sure they want to delete the exercise
-        bool answer = await DisplayAlert("Delete Exercise", "Are you sure you want to delete this exercise?", "Yes", "No");
-        if (!answer) return;
-        //Edit deleteExercise method to search ExWorkout table for exerciseId and delete all rows with that exerciseId
-        await App.ExerciseRepository.DeleteExercise(exerciseTitle.Text);
-        await Navigation.PopAsync();
-        DisplayAlert("Exercise Deleted", $"{App.ExerciseRepository.StatusMessage}", "Ok");
-    }
-
-    private void exNote_TextChanged(object sender, TextChangedEventArgs e)
-    {
-
-        DisplayAlert("Action", "TextChanged", "ok");
-
+        await DisplayAlert("Notice", "Exercise deletion will be wired up next.", "OK");
     }
 
     private async void OnSaveButtonClicked(object sender, EventArgs e)
     {
-        string content = exerciseNote.Text;
-        Exercise currentExercise = await App.ExerciseRepository.GetExercise(ExerciseTitle);
-        currentExercise.Note = content; 
-
-        await App.ExerciseRepository.UpdateExercise(currentExercise);
-
-        DisplayAlert("Saved", "Note saved", "Ok");
-
-        Console.WriteLine("save button");
+        await DisplayAlert("Saved", "Note functionality will be connected with the API.", "OK");
     }
-
 }

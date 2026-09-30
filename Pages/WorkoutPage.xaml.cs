@@ -55,7 +55,7 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
             exerciseGrid.RowDefinitions.Add(newExerciseRow);
             int lastRow = exerciseGrid.RowDefinitions.Count - 1;
 
-            ExerciseComponent exerciseComponent = new ExerciseComponent(exercise.Name, WorkoutTitle);
+            ExerciseComponent exerciseComponent = new ExerciseComponent(exercise.ExerciseId, exercise.Name, WorkoutId, WorkoutTitle ?? string.Empty);
             exerciseGrid.Add(exerciseComponent, 0, lastRow);
         }
     }

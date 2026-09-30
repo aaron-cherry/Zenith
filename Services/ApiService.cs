@@ -99,5 +99,67 @@ namespace WorkoutApp.Services
 
             return null;
         }
+
+        // Logs/Sets
+
+        public async Task<List<ExerciseLogDto>> GetLogsAsync(int workoutId, int exerciseId)
+        {
+            try
+            {
+                var logs = await _httpClient.GetFromJsonAsync<List<ExerciseLogDto>>($"api/workouts/{workoutId}/exercises/{exerciseId}/logs");
+                return logs ?? new List<ExerciseLogDto>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching logs: {ex.Message}");
+                return new List<ExerciseLogDto>();
+            }
+        }
+
+        public async Task<ExerciseLogDto?> CreateLogAsync(int workoutId, int exerciseId, int setNumber, Dictionary<string, double> metrics)
+        {
+            try
+            {
+                var payload = new ExerciseLogCreateDto
+                {
+                    SetNumber = setNumber,
+                    Metrics = metrics
+                };
+                var response = await _httpClient.PostAsJsonAsync($"api/workouts/{workoutId}/exercises/{exerciseId}/logs", payload);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<ExerciseLogDto>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating log: {ex.Message}");
+            }
+
+            return null;
+        }
+
+        public async Task<bool> UpdateLogAsync(int workoutId, int exerciseId, int logId, int setNumber, Dictionary<string, double> metrics)
+        {
+            try
+            {
+                var payload = new ExerciseLogUpdateDto
+                {
+                    SetNumber = setNumber,
+                    Metrics = metrics
+                };
+
+                var response = await _httpClient.PutAsJsonAsync(
+                    $"api/workouts/{workoutId}/exercises/{exerciseId}/logs/{logId}", payload);
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating log: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

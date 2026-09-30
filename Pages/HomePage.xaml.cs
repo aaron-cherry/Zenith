@@ -1,6 +1,4 @@
-using Android.Views;
 using WorkoutApp.CustomComponents;
-using WorkoutApp.DataAccess;
 using WorkoutApp.Models;
 using WorkoutApp.Services;
 

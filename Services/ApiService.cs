@@ -217,5 +217,19 @@ namespace WorkoutApp.Services
                 return false;
             }
         }
+
+        public async Task<List<Exercise>> GetAllExercisesAsync()
+        {
+            try
+            {
+                var exercises = await _httpClient.GetFromJsonAsync<List<Exercise>>("api/exercises");
+                return exercises ?? new List<Exercise>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching global exercises: {ex.Message}");
+                return new List<Exercise>();
+            }
+        }
     }
 }

@@ -35,19 +35,44 @@
                     BackgroundColor="#1f1f1f"
                     HorizontalOptions="Center"
                     VerticalOptions="Center"/>
-            <Entry x:Name="exerciseEntry"
-                    Placeholder="Enter exercise name"
-                    Completed="Entry_Completed"
-                   Margin="10, 5, 10, 5">
-                <Entry.Keyboard>
-                    <Keyboard x:FactoryMethod="Create">
-                        <!--FactoryMethod will not have an error when debugging on devices with a soft keyboard-->
-                        <x:Arguments>
-                            <KeyboardFlags>CapitalizeWord</KeyboardFlags>
-                        </x:Arguments>
-                    </Keyboard>
-                </Entry.Keyboard>
-            </Entry>
+            <VerticalStackLayout Margin="10, 5, 10, 5">
+                <Entry x:Name="exerciseEntry"
+                       Placeholder="Enter or select exercise..."
+                       TextChanged="OnExerciseTextChanged"
+                       Completed="Entry_Completed">
+                    <Entry.Keyboard>
+                        <Keyboard x:FactoryMethod="Create">
+                            <x:Arguments>
+                                <KeyboardFlags>CapitalizeWord</KeyboardFlags>
+                            </x:Arguments>
+                        </Keyboard>
+                    </Entry.Keyboard>
+                </Entry>
+
+                <!-- Autocomplete Dropdown List -->
+                <Border x:Name="suggestionsBorder"
+                        IsVisible="False"
+                        BackgroundColor="#262626"
+                        MaximumHeightRequest="180"
+                        StrokeThickness="1"
+                        Stroke="#3a3a3a"
+                        Margin="0, -5, 0, 5">
+                    <CollectionView x:Name="suggestionsView"
+                                    SelectionMode="Single"
+                                    SelectionChanged="OnSuggestionSelected">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="12, 10">
+                                    <Label Text="{Binding Name}"
+                                           TextColor="White"
+                                           FontSize="15"
+                                           VerticalOptions="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Border>
+            </VerticalStackLayout>
             <Button x:Name="deleteWorkout" Text="Delete Workout"
                     Clicked="deleteWorkoutClicked"
                     Margin="5"

@@ -9,14 +9,15 @@ namespace WorkoutApp.Pages;
 [QueryProperty(nameof(WorkoutTitle), "workoutTitle")]
 public partial class WorkoutPage : ContentPage, IQueryAttributable
 {
-    private readonly ApiService _apiService;
+    private readonly ApiService _apiService = new ApiService();
     public int WorkoutId { get; set; }
     public string? WorkoutTitle { get; set; }
+
+    private List<Exercise> _allAvailableExercises = new();
 
     public WorkoutPage()
     {
         InitializeComponent();
-        _apiService = new ApiService();
         BindingContext = this;
     }
 
@@ -38,6 +39,12 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
     {
         base.OnAppearing();
         await DisplayExercisesAsync();
+        await LoadAllExercisesForSuggestionsAsync();
+    }
+
+    private async Task LoadAllExercisesForSuggestionsAsync()
+    {
+        _allAvailableExercises = await _apiService.GetAllExercisesAsync();
     }
 
     private async Task DisplayExercisesAsync()
@@ -60,9 +67,49 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
         }
     }
 
+    private void OnExerciseTextChanged(object sender, TextChangedEventArgs e)
+    {
+        string query = e.NewTextValue?.Trim() ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            suggestionsBorder.IsVisible = false;
+            suggestionsView.ItemsSource = null;
+            return;
+        }
+
+        var matches = _allAvailableExercises
+            .Where(x => x.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        if (matches.Count > 0)
+        {
+            suggestionsView.ItemsSource = matches;
+            suggestionsBorder.IsVisible = true;
+        }
+        else
+        {
+            suggestionsBorder.IsVisible = false;
+            suggestionsView.ItemsSource = null;
+        }
+    }
+
+    private async void OnSuggestionSelected(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection.FirstOrDefault() is Exercise selected)
+        {
+            suggestionsBorder.IsVisible = false;
+            suggestionsView.SelectedItem = null;
+
+            // Submit selected exercise directly
+            await AddExerciseByNameAsync(selected.Name);
+        }
+    }
+
     private async void Entry_Completed(object sender, EventArgs e)
     {
         string exerciseName = exerciseEntry.Text?.Trim() ?? string.Empty;
+        suggestionsBorder.IsVisible = false;
 
         if (string.IsNullOrWhiteSpace(exerciseName))
         {
@@ -70,11 +117,17 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
             return;
         }
 
-        var created = await _apiService.AddExerciseToWorkoutAsync(WorkoutId, exerciseName);
+        await AddExerciseByNameAsync(exerciseName);
+    }
+
+    private async Task AddExerciseByNameAsync(string name)
+    {
+        var created = await _apiService.AddExerciseToWorkoutAsync(WorkoutId, name);
         if (created != null)
         {
             statusMessageLabel.Text = $"Added {created.Name}";
             await DisplayExercisesAsync();
+            await LoadAllExercisesForSuggestionsAsync(); // Keep suggestions updated
         }
         else
         {
@@ -82,7 +135,7 @@ public partial class WorkoutPage : ContentPage, IQueryAttributable
         }
 
         exerciseEntry.Text = string.Empty;
-        exerciseEntry.Focus();
+        exerciseEntry.Unfocus();
     }
 
     private async void deleteWorkoutClicked(object sender, EventArgs e)

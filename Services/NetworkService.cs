@@ -5,12 +5,11 @@
         //Local LAN IP on HTTP port 5163
         public static string BaseUrl => "http://10.0.0.229:5163/";
 
-        public static HttpClient CreateClient()
+        private static readonly HttpClient _client = new HttpClient
         {
-            return new HttpClient
-            {
-                BaseAddress = new Uri(BaseUrl)
-            };
-        }
+            BaseAddress = new Uri(BaseUrl)
+        };
+
+        public static HttpClient CreateClient() => _client;
     }
 }

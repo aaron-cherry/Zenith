@@ -1,93 +1,102 @@
-using WorkoutApp.Models;
+using WorkoutApp.Services;
 
 namespace WorkoutApp.CustomComponents;
 
 public partial class SetComponent : ContentView
 {
-    public EventHandler SetChanged;
+    private readonly ApiService _apiService = new ApiService();
+
+    public EventHandler? SetChanged;
+    public event EventHandler? SetDeleted;
+
+    public int LogId { get; set; }
+    public int WorkoutId { get; set; }
+    public int ExerciseId { get; set; }
+    public int SetNumber { get; set; }
     private int GridRow { get; set; }
-	public SetComponent(int setId, double weight,double reps, int gridRow)
-	{
-		InitializeComponent();
-        setIdLabel.Text = setId.ToString();
+
+    public SetComponent(int logId, int workoutId, int exerciseId, int setNumber, double weight, double reps, int gridRow)
+    {
+        InitializeComponent();
+
+        LogId = logId;
+        WorkoutId = workoutId;
+        ExerciseId = exerciseId;
+        SetNumber = setNumber;
+        GridRow = gridRow;
+
+        setIdLabel.Text = logId.ToString();
         weightEntry.Text = weight.ToString();
         repsEntry.Text = reps.ToString();
-        GridRow = gridRow;
-	}
+    }
 
     public SetComponent()
     {
         InitializeComponent();
     }
 
-
     public async void WeightEntryCompleted(object sender, EventArgs e)
     {
-        double weight;
-        weight = double.TryParse(weightEntry.Text , out weight) ? double.Parse(weightEntry.Text) : 0;
-        await App.SetRepository.UpdateSet(int.Parse(setIdLabel.Text), double.Parse(weightEntry.Text), null);
+        await SaveSetAsync();
         repsEntry.Focus();
     }
 
-    public async void OnWeightEntryUnfocused(object sender, EventArgs e)
+    public void OnWeightEntryUnfocused(object sender, EventArgs e)
     {
         WeightEntryCompleted(sender, e);
     }
 
     public async void RepsEntryCompleted(object sender, EventArgs e)
     {
-        double reps;
-        reps = double.TryParse(repsEntry.Text, out reps) ? double.Parse(repsEntry.Text) : 0;
-        await App.SetRepository.UpdateSet(int.Parse(setIdLabel.Text), null, reps);
-
-        
-        SetChanged.Invoke(this, EventArgs.Empty);
+        await SaveSetAsync();
+        SetChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    public async void OnRepsEntryUnfocused(object sender, EventArgs e)
+    public void OnRepsEntryUnfocused(object sender, EventArgs e)
     {
         RepsEntryCompleted(sender, e);
     }
 
-	public async void DeleteSetButtonClicked(object sender, EventArgs e)
-	{
-        //Ask user if they are sure they want to delete the set
-        bool answer = await Application.Current.MainPage.DisplayAlert("Delete Set", "Are you sure you want to delete this set?", "Yes", "No");
+    private async Task SaveSetAsync()
+    {
+        double.TryParse(weightEntry.Text, out double weight);
+        double.TryParse(repsEntry.Text, out double reps);
+
+        var metrics = new Dictionary<string, double>
+        {
+            { "weight", weight },
+            { "reps", reps }
+        };
+
+        if (WorkoutId > 0 && ExerciseId > 0 && LogId > 0)
+        {
+            await _apiService.UpdateLogAsync(WorkoutId, ExerciseId, LogId, SetNumber, metrics);
+        }
+    }
+
+    public async void DeleteSetButtonClicked(object sender, EventArgs e)
+    {
+        if (Application.Current?.MainPage == null) return;
+
+        bool answer = await Application.Current.MainPage.DisplayAlert(
+            "Delete Set",
+            $"Are you sure you want to delete Set {SetNumber}?",
+            "Yes",
+            "No");
+
         if (!answer) return;
 
-        try
+        if (WorkoutId > 0 && ExerciseId > 0 && LogId > 0)
         {
-            //Prepare your eyes for some really hacky UI shit 
-            List<Set> allSets = await App.SetRepository.GetAllSets();
-            Set? set = allSets.FirstOrDefault(x => x.SetId == int.Parse(setIdLabel.Text));
-            int gridIndex = set.SetNumber - 1;
-            if (set == null) return;
-
-            // Get the parent of the button (the StackLayout)
-            HorizontalStackLayout parent = (HorizontalStackLayout)((Button)sender).Parent;
-            // Get the parent of the StackLayout (the Grid)
-            VerticalStackLayout parentVSL = (VerticalStackLayout)parent.Parent;
-            SetComponent parentSC = (SetComponent)parentVSL.Parent;
-            Grid parentGrid = (Grid)parentSC.Parent;
-
-            int setRow = parentGrid.GetRow(parentSC);
-            foreach (var child in parentGrid.Children.ToList())
+            bool success = await _apiService.DeleteLogAsync(WorkoutId, ExerciseId, LogId);
+            if (success)
             {
-                int childRow = parentGrid.GetRow(child);
-                if (childRow == setRow)
-                {
-                    parentGrid.Children.Remove(child);
-                    //break;
-                }
+                SetDeleted?.Invoke(this, EventArgs.Empty);
             }
-            parentGrid.RowDefinitions.RemoveAt(gridIndex);
-
-            //Delete set from database
-            await App.SetRepository.DeleteSet(set.SetId);
-        }
-        catch (Exception ex)
-        {
-            var msg = ex.Message;
+            else
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Failed to delete set from server.", "OK");
+            }
         }
     }
 }

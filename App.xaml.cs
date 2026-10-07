@@ -18,7 +18,7 @@ namespace WorkoutApp
 
             MainPage = new AppShell();
 
-            // Initialize all repository objects with WorkoutRepository singleton object
+            // Initialize all repository objects with corresponding singleton object
             ExWorkRepo = exWorkRepo;
             WorkoutRepository = workoutRepo;
             ExerciseRepository = exerciseRepo;

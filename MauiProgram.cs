@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using WorkoutApp.DataAccess;
 using WorkoutApp.Services;
 
 namespace WorkoutApp
@@ -18,15 +17,11 @@ namespace WorkoutApp
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
-            //Db access
-            string dbPath = FileAccessHelper.GetLocalFilePath("zenith.db3");
-            builder.Services.AddSingleton<WorkoutRepository>(s => ActivatorUtilities.CreateInstance<WorkoutRepository>(s, dbPath));
-            builder.Services.AddSingleton<ExerciseRepository>(s => ActivatorUtilities.CreateInstance<ExerciseRepository>(s, dbPath));
-            builder.Services.AddSingleton<ExerciseWorkoutRepository>(s => ActivatorUtilities.CreateInstance<ExerciseWorkoutRepository>(s, dbPath));
-            builder.Services.AddSingleton<SetRepository>(s => ActivatorUtilities.CreateInstance<SetRepository>(s, dbPath));
-            builder.Services.AddSingleton<DatabaseService>(s => ActivatorUtilities.CreateInstance<DatabaseService>(s, dbPath));
+
+            // Register our remote API service
+            builder.Services.AddSingleton<ApiService>();
 
             return builder.Build();
         }

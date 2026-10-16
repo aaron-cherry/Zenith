@@ -11,7 +11,7 @@ Built with a decoupled client-server architecture, Zenith pairs a cross-platform
 ```
 ┌───────────────────────────────────────┐
 │        Client: .NET MAUI App          │
-│   (Android - Samsung Galaxy Z Fold5)  │
+│               (Android)               │
 │   - MVVM & Modular CustomComponents   │
 │   - Debounced Autocomplete Typeahead  │
 │   - Dynamic Set Rows & Blur-Save      │
@@ -55,7 +55,7 @@ Built with a decoupled client-server architecture, Zenith pairs a cross-platform
 * **Framework:** .NET MAUI (.NET 9)
 * **Language:** C# 13 / XAML
 * **Networking:** Reusable `HttpClient` managed through `NetworkService` and `ApiService`
-* **Target Platforms:** Android (Primary hardware: Samsung Galaxy Z Fold5), iOS, macOS, Windows
+* **Target Platforms:** Android, iOS, macOS, Windows
 
 ### Backend API
 * **Framework:** ASP.NET Core Web API (.NET 8)
